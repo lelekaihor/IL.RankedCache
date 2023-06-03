@@ -62,6 +62,12 @@ namespace IL.RankedCache.Services
                 await _cacheProvider.Delete(key);
                 _cacheAccessCounter.Remove(key);
             }
+
+            //Reset counters on each cleanup - supposed to allow new cache entries to take over old top ranked in previous iteration
+            foreach (var entryCounter in _cacheAccessCounter)
+            {
+                _cacheAccessCounter[entryCounter.Key] = 1;
+            }
         }
 
         private void SetupCleanupTimer()
