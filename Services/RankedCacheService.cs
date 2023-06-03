@@ -115,7 +115,7 @@ namespace IL.RankedCache.Services
         {
             if (typeof(TRange) == typeof(short))
             {
-                var shortValue = Convert.ToInt16(value);
+                var shortValue = (short)(object)value;
                 if (shortValue < short.MaxValue)
                 {
                     shortValue++;
@@ -126,7 +126,7 @@ namespace IL.RankedCache.Services
 
             if (typeof(TRange) == typeof(int))
             {
-                var intValue = Convert.ToInt32(value);
+                var intValue = (int)(object)value;
                 if (intValue < int.MaxValue)
                 {
                     intValue++;
@@ -137,7 +137,7 @@ namespace IL.RankedCache.Services
 
             if (typeof(TRange) == typeof(long))
             {
-                var longValue = Convert.ToInt64(value);
+                var longValue = (long)(object)value;
                 if (longValue < long.MaxValue)
                 {
                     longValue++;
@@ -146,7 +146,7 @@ namespace IL.RankedCache.Services
                 return (TRange)(object)longValue;
             }
 
-            throw new NotSupportedException("Unsupported type for TRange.");
+            throw new NotSupportedException($"TRange of type {typeof(TRange)} is not supported.");
         }
     }
 }
