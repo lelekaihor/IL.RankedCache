@@ -7,7 +7,7 @@ namespace IL.RankedCache.Services
     /// <summary>
     /// Ranked cache service
     /// </summary>
-    /// <typeparam name="TRange">Accepts short, int and long as constraints. Will throw exception for all other types.</typeparam>
+    /// <typeparam name="TRange">Accepts short, int and long as constraints. Will throw NotSupportedException for all other types.</typeparam>
     public class RankedCacheService<TRange> : IRankedCacheService, IDisposable where TRange : struct
     {
         private readonly ICacheProvider _cacheProvider;
@@ -19,7 +19,9 @@ namespace IL.RankedCache.Services
         {
             if (typeof(TRange) != typeof(short) || typeof(TRange) != typeof(int) || typeof(TRange) != typeof(long))
             {
+                throw new NotSupportedException($"TRange of type {typeof(TRange)} is not supported.");
             }
+
             _cacheProvider = cacheProvider;
             SetupCleanupTimer();
         }
