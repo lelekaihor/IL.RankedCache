@@ -8,7 +8,7 @@ namespace IL.RankedCache.Services
     /// Ranked cache service
     /// </summary>
     /// <typeparam name="TRange">Accepts short, int and long as constraints. Will throw NotSupportedException for all other types.</typeparam>
-    public class RankedCacheService<TRange> : IRankedCacheService, IDisposable where TRange : struct
+    public class RankedCacheService<TRange> : IRankedCacheService where TRange : struct
     {
         private readonly ICacheProvider _cacheProvider;
         private readonly RankedCachePolicy _policy = RankedCachePolicy.Default;
@@ -41,25 +41,14 @@ namespace IL.RankedCache.Services
             _policy = policy;
         }
 
-        /// <summary>
-        /// Add object to cache, start tracking object access count
-        /// </summary>
-        /// <typeparam name="T">Object type</typeparam>
-        /// <param name="key">Cache key</param>
-        /// <param name="obj">Object to be cached</param>
-        /// <returns>Task</returns>
+        /// <inheritdoc cref="IRankedCacheService" />
         public async Task Add<T>(string key, T obj)
         {
             await _cacheProvider.Add(key, obj);
             _cacheAccessCounter[key] = (TRange)(object)0;
         }
 
-        /// <summary>
-        /// Get object from cache by key, automatically increases cache access counter for given key
-        /// </summary>
-        /// <typeparam name="T">Object type</typeparam>
-        /// <param name="key">Cache key</param>
-        /// <returns>Object of type specified in constraint</returns>
+        /// <inheritdoc cref="IRankedCacheService" />
         public async Task<T> Get<T>(string key)
         {
             if (_cacheAccessCounter.ContainsKey(key))
@@ -70,31 +59,20 @@ namespace IL.RankedCache.Services
             return await _cacheProvider.Get<T>(key);
         }
 
-        /// <summary>
-        /// Delete object from cache, automatically deletes corresponding entry in cache access counter
-        /// </summary>
-        /// <param name="key">Cache key</param>
-        /// <returns>Task</returns>
+        /// <inheritdoc cref="IRankedCacheService" />
         public async Task Delete(string key)
         {
             await _cacheProvider.Delete(key);
             _cacheAccessCounter.Remove(key);
         }
 
-        /// <summary>
-        /// Check if cache has such key
-        /// </summary>
-        /// <param name="key">Cache key</param>
-        /// <returns>True if cache contains such key.</returns>
+        /// <inheritdoc cref="IRankedCacheService" />
         public bool HasKey(string key)
         {
             return _cacheAccessCounter.ContainsKey(key);
         }
 
-        /// <summary>
-        /// Task to cleanup cache entries according to MaxItems specified in RankedCachePolicy, resets all counters for remaining objects
-        /// </summary>
-        /// <returns>Task</returns>
+        /// <inheritdoc cref="IRankedCacheService" />
         public async Task Cleanup()
         {
             var entriesToRemove = _cacheAccessCounter
