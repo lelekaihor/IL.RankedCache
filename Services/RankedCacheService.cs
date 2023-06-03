@@ -41,14 +41,14 @@ namespace IL.RankedCache.Services
             _policy = policy;
         }
 
-        /// <inheritdoc cref="IRankedCacheService" />
+        /// <inheritdoc cref="IRankedCacheService.Add" />
         public async Task Add<T>(string key, T obj)
         {
             await _cacheProvider.Add(key, obj);
             _cacheAccessCounter[key] = (TRange)(object)0;
         }
 
-        /// <inheritdoc cref="IRankedCacheService" />
+        /// <inheritdoc cref="IRankedCacheService.Get" />
         public async Task<T> Get<T>(string key)
         {
             if (_cacheAccessCounter.ContainsKey(key))
@@ -59,20 +59,20 @@ namespace IL.RankedCache.Services
             return await _cacheProvider.Get<T>(key);
         }
 
-        /// <inheritdoc cref="IRankedCacheService" />
+        /// <inheritdoc cref="IRankedCacheService.Delete" />
         public async Task Delete(string key)
         {
             await _cacheProvider.Delete(key);
             _cacheAccessCounter.Remove(key);
         }
 
-        /// <inheritdoc cref="IRankedCacheService" />
+        /// <inheritdoc cref="IRankedCacheService.HasKey" />
         public bool HasKey(string key)
         {
             return _cacheAccessCounter.ContainsKey(key);
         }
 
-        /// <inheritdoc cref="IRankedCacheService" />
+        /// <inheritdoc cref="IRankedCacheService.Cleanup" />
         public async Task Cleanup()
         {
             var entriesToRemove = _cacheAccessCounter
