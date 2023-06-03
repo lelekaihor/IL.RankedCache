@@ -114,21 +114,33 @@ namespace IL.RankedCache.Services
             if (typeof(TRange) == typeof(short))
             {
                 var shortValue = Convert.ToInt16(value);
-                shortValue++;
+                if (shortValue < short.MaxValue)
+                {
+                    shortValue++;
+                }
+
                 return (TRange)(object)shortValue;
             }
 
             if (typeof(TRange) == typeof(int))
             {
                 var intValue = Convert.ToInt32(value);
-                intValue++;
+                if (intValue < int.MaxValue)
+                {
+                    intValue++;
+                }
+
                 return (TRange)(object)intValue;
             }
 
             if (typeof(TRange) == typeof(long))
             {
                 var longValue = Convert.ToInt64(value);
-                longValue++;
+                if (longValue < long.MaxValue)
+                {
+                    longValue++;
+                }
+
                 return (TRange)(object)longValue;
             }
 
