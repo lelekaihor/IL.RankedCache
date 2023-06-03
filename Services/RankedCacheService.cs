@@ -4,15 +4,22 @@ using IL.RankedCache.Policy;
 
 namespace IL.RankedCache.Services
 {
-    public class RankedCacheService : IRankedCacheService, IDisposable
+    /// <summary>
+    /// Ranked cache service
+    /// </summary>
+    /// <typeparam name="TRange">Accepts short, int and long as constraints. Will throw exception for all other types.</typeparam>
+    public class RankedCacheService<TRange> : IRankedCacheService, IDisposable where TRange : struct
     {
         private readonly ICacheProvider _cacheProvider;
         private readonly RankedCachePolicy _policy = RankedCachePolicy.Default;
-        private readonly Dictionary<string, int> _cacheAccessCounter = new();
+        private readonly Dictionary<string, TRange> _cacheAccessCounter = new();
         private Timer? _cleanupTimer;
 
         public RankedCacheService(ICacheProvider cacheProvider)
         {
+            if (typeof(TRange) != typeof(short) || typeof(TRange) != typeof(int) || typeof(TRange) != typeof(long))
+            {
+            }
             _cacheProvider = cacheProvider;
             SetupCleanupTimer();
         }
@@ -25,14 +32,14 @@ namespace IL.RankedCache.Services
         public async Task Add<T>(string key, T obj)
         {
             await _cacheProvider.Add(key, obj);
-            _cacheAccessCounter[key] = 0;
+            _cacheAccessCounter[key] = (TRange)(object)0;
         }
 
         public async Task<T> Get<T>(string key)
         {
             if (_cacheAccessCounter.ContainsKey(key))
             {
-                _cacheAccessCounter[key]++;
+                _cacheAccessCounter[key] = Increment(_cacheAccessCounter[key]);
             }
 
             return await _cacheProvider.Get<T>(key);
@@ -66,8 +73,13 @@ namespace IL.RankedCache.Services
             //Reset counters on each cleanup - supposed to allow new cache entries to take over old top ranked in previous iteration
             foreach (var entryCounter in _cacheAccessCounter)
             {
-                _cacheAccessCounter[entryCounter.Key] = 1;
+                _cacheAccessCounter[entryCounter.Key] = (TRange)(object)1;
             }
+        }
+
+        public void Dispose()
+        {
+            _cleanupTimer?.Dispose();
         }
 
         private void SetupCleanupTimer()
@@ -94,12 +106,33 @@ namespace IL.RankedCache.Services
 
         private void CleanupCallback(object state)
         {
-            Cleanup();
+            _ = Cleanup();
         }
 
-        public void Dispose()
+        private static TRange Increment(TRange value)
         {
-            _cleanupTimer?.Dispose();
+            if (typeof(TRange) == typeof(short))
+            {
+                var shortValue = Convert.ToInt16(value);
+                shortValue++;
+                return (TRange)(object)shortValue;
+            }
+
+            if (typeof(TRange) == typeof(int))
+            {
+                var intValue = Convert.ToInt32(value);
+                intValue++;
+                return (TRange)(object)intValue;
+            }
+
+            if (typeof(TRange) == typeof(long))
+            {
+                var longValue = Convert.ToInt64(value);
+                longValue++;
+                return (TRange)(object)longValue;
+            }
+
+            throw new NotSupportedException("Unsupported type for TRange.");
         }
     }
 }
