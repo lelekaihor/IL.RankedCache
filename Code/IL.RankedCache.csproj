@@ -17,13 +17,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="LICENSE.txt" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="LICENSE.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <None Include="LICENSE.txt" Pack="true" Visible="false" PackagePath=""/>
   </ItemGroup>
 
   <ItemGroup>
