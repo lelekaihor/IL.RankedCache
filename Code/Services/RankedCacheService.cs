@@ -72,16 +72,19 @@ namespace IL.RankedCache.Services
         /// <inheritdoc cref="IRankedCacheService.Cleanup" />
         public async Task Cleanup()
         {
-            var entriesToRemove = _cacheAccessCounter
-                .OrderByDescending(kvp => kvp.Value)
-                .Skip(_policy.MaxItems)
-                .Select(kvp => kvp.Key)
-                .ToList();
-
-            foreach (var key in entriesToRemove)
+            if (_cacheAccessCounter.Count > _policy.MaxItems)
             {
-                await _cacheProvider.Delete(key);
-                _cacheAccessCounter.Remove(key);
+                var entriesToRemove = _cacheAccessCounter
+                    .OrderByDescending(kvp => kvp.Value)
+                    .Skip(_policy.MaxItems)
+                    .Select(kvp => kvp.Key)
+                    .ToList();
+
+                foreach (var key in entriesToRemove)
+                {
+                    await _cacheProvider.Delete(key);
+                    _cacheAccessCounter.Remove(key);
+                }
             }
 
             //Reset counters on each cleanup - supposed to allow new cache entries to take over old top ranked in previous iteration
