@@ -9,3 +9,6 @@
 ## Usage
 
 * Package comes with `ServiceCollectionExtensions: AddRankedCache()` that have to be used on startup. Extension has different overloads to cover different invariants of setup.
+
+## Nuget
+  https://www.nuget.org/packages/IL.RankedCache/
