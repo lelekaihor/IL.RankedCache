@@ -20,7 +20,7 @@ namespace IL.RankedCache.Extensions
 
             services.Configure(options ?? (_ => { }));
             services.AddSingleton<ICacheProvider, DefaultCacheProvider>();
-            services.AddSingleton<IRankedCacheService, RankedCacheService<TCacheCounterOrder>>();
+            services.AddSingleton<IRankedCacheService<TCacheCounterOrder>, RankedCacheService<TCacheCounterOrder>>();
         }
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace IL.RankedCache.Extensions
 
             services.Configure(options ?? (_ => { }));
             services.AddSingleton<ICacheProvider, TCacheProvider>();
-            services.AddSingleton<IRankedCacheService, RankedCacheService<TCacheCounterOrder>>();
+            services.AddSingleton<IRankedCacheService<TCacheCounterOrder>, RankedCacheService<TCacheCounterOrder>>();
         }
     }
 }

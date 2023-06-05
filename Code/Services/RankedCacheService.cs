@@ -10,7 +10,7 @@ namespace IL.RankedCache.Services
     /// Ranked cache service
     /// </summary>
     /// <typeparam name="TCacheCounterOrder">Accepts short, int and long as constraints. Will throw NotSupportedException for all other types.</typeparam>
-    internal class RankedCacheService<TCacheCounterOrder> : IRankedCacheService where TCacheCounterOrder : struct
+    internal class RankedCacheService<TCacheCounterOrder> : IRankedCacheService<TCacheCounterOrder> where TCacheCounterOrder : struct
     {
         private readonly ICacheProvider _cacheProvider;
         private readonly RankedCachePolicy _policy;
@@ -89,6 +89,11 @@ namespace IL.RankedCache.Services
             {
                 _cacheAccessCounter[entryCounter.Key] = (TCacheCounterOrder)(object)1;
             }
+        }
+
+        public TCacheCounterOrder? GetCacheAccessCounter(string key)
+        {
+            return HasKey(key) ? _cacheAccessCounter[key] : null;
         }
 
         public void Dispose()

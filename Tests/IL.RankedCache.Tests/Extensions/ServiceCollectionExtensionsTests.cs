@@ -22,9 +22,9 @@ namespace IL.RankedCache.Tests.Extensions
             // Assert
             var serviceProvider = services.BuildServiceProvider();
             Assert.NotNull(serviceProvider.GetService<ICacheProvider>());
-            Assert.NotNull(serviceProvider.GetService<IRankedCacheService>());
+            Assert.NotNull(serviceProvider.GetService<IRankedCacheService<short>>());
             Assert.IsType<DefaultCacheProvider>(serviceProvider.GetService<ICacheProvider>());
-            Assert.IsType<RankedCacheService<short>>(serviceProvider.GetService<IRankedCacheService>());
+            Assert.IsType<RankedCacheService<short>>(serviceProvider.GetService<IRankedCacheService<short>>());
         }
 
         [Fact]
@@ -39,9 +39,9 @@ namespace IL.RankedCache.Tests.Extensions
             // Assert
             var serviceProvider = services.BuildServiceProvider();
             Assert.NotNull(serviceProvider.GetService<ICacheProvider>());
-            Assert.NotNull(serviceProvider.GetService<IRankedCacheService>());
+            Assert.NotNull(serviceProvider.GetService<IRankedCacheService<short>>());
             Assert.IsType<CustomCacheProvider>(serviceProvider.GetService<ICacheProvider>());
-            Assert.IsType<RankedCacheService<short>>(serviceProvider.GetService<IRankedCacheService>());
+            Assert.IsType<RankedCacheService<short>>(serviceProvider.GetService<IRankedCacheService<short>>());
         }
 
         [Fact]

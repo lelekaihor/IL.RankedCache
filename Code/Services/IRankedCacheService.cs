@@ -5,7 +5,7 @@ namespace IL.RankedCache.Services
     /// <summary>
     /// Ranked cache interface
     /// </summary>
-    public interface IRankedCacheService : ICacheProvider, IDisposable
+    public interface IRankedCacheService<TCacheCounterOrder> : ICacheProvider, IDisposable where TCacheCounterOrder : struct
     {
         /// <summary>
         /// Add object to cache, start tracking object access count
@@ -43,5 +43,10 @@ namespace IL.RankedCache.Services
         /// </summary>
         /// <returns>Task</returns>
         Task Cleanup();
+
+        /// <summary>
+        /// Get the counter of how many times cache entry was accessed
+        /// </summary>
+        TCacheCounterOrder? GetCacheAccessCounter(string key);
     }
 }
