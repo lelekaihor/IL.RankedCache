@@ -4,6 +4,16 @@
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <PackageVersion>1.0.1</PackageVersion>
+    <Title>Ranked Cache</Title>
+    <Authors>Ihor Leleka</Authors>
+    <Description>Generic facade over your caching mechanism allowing to keep track of how many times cache entry was accessed as well as automatic/manual cleanup of least used cache entries.</Description>
+    <Copyright>Ihor Leleka</Copyright>
+    <PackageProjectUrl>https://github.com/lelekaihor/IL.RankedCache</PackageProjectUrl>
+    <PackageLicenseExpression>GPL-3.0 license</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/lelekaihor/IL.RankedCache</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
   <ItemGroup>
