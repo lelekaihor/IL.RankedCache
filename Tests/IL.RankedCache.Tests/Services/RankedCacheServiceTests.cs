@@ -1,4 +1,5 @@
 ﻿using IL.RankedCache.CacheProvider;
+using IL.RankedCache.Models;
 using IL.RankedCache.Policies;
 using IL.RankedCache.Services;
 using Microsoft.Extensions.Options;
@@ -155,6 +156,36 @@ namespace IL.RankedCache.Tests.Services
             Assert.Equal(1, rankedCacheService.GetCacheAccessCounter("key3"));
             Assert.Equal(1, rankedCacheService.GetCacheAccessCounter("key4"));
             Assert.Equal(1, rankedCacheService.GetCacheAccessCounter("key5"));
+        }
+
+        [Fact]
+        public async Task Cleanup_AutomatedMode_RemovesExcessEntries_CallsCacheProviderDelete()
+        {
+            // Arrange
+            var cacheProviderMock = new Mock<ICacheProvider>();
+            var policy = Options.Create(new RankedCachePolicy { MaxItems = 5, CleanupMode = CleanupMode.Auto, Frequency = TimeSpan.FromSeconds(3)});
+            var rankedCacheService = new RankedCacheService<int>(cacheProviderMock.Object, policy);
+            var cacheAccessCounter = new Dictionary<string, int>
+            {
+                { "key1", 5 },
+                { "key2", 3 },
+                { "key3", 2 },
+                { "key4", 7 },
+                { "key5", 4 },
+                { "key6", 1 },
+                { "key7", 6 }
+            };
+            rankedCacheService.SetCacheAccessCounter(cacheAccessCounter);
+
+            // Act
+            Thread.Sleep(TimeSpan.FromSeconds(3));
+            //Should perform cleanup automatically
+            Thread.Sleep(TimeSpan.FromSeconds(1));
+
+            // Assert
+            cacheProviderMock.Verify(mock => mock.Delete(It.IsAny<string>()), Times.Exactly(2));
+            cacheProviderMock.Verify(mock => mock.Delete("key3"), Times.Once);
+            cacheProviderMock.Verify(mock => mock.Delete("key6"), Times.Once);
         }
     }
 
