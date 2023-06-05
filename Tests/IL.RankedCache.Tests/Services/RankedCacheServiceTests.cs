@@ -159,7 +159,7 @@ namespace IL.RankedCache.Tests.Services
         }
 
         [Fact]
-        public async Task Cleanup_AutomatedMode_RemovesExcessEntries_CallsCacheProviderDelete()
+        public void Cleanup_AutomatedMode_RemovesExcessEntries_CallsCacheProviderDelete()
         {
             // Arrange
             var cacheProviderMock = new Mock<ICacheProvider>();
