@@ -1,6 +1,6 @@
 ﻿using IL.RankedCache.Models;
 
-namespace IL.RankedCache.Policy
+namespace IL.RankedCache.Policies
 {
     public class RankedCachePolicy
     {

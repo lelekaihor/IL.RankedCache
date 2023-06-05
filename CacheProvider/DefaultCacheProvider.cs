@@ -2,22 +2,25 @@
 
 namespace IL.RankedCache.CacheProvider
 {
-    public class DefaultCacheProvider : ICacheProvider
+    internal class DefaultCacheProvider : ICacheProvider
     {
         private readonly MemoryCache _cache;
         private readonly object _lockObject;
 
-        public DefaultCacheProvider()
+        internal DefaultCacheProvider()
         {
             _cache = MemoryCache.Default;
             _lockObject = new object();
         }
 
-        public Task Add<T>(string key, T obj)
+        public Task Add<T>(string key, T? obj)
         {
             lock (_lockObject)
             {
-                _cache.Set(key, obj, DateTimeOffset.MaxValue);
+                if (obj != null)
+                {
+                    _cache.Set(key, obj, DateTimeOffset.MaxValue);
+                }
             }
 
             return Task.CompletedTask;

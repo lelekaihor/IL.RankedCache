@@ -1,51 +1,48 @@
 ﻿using IL.RankedCache.CacheProvider;
+using IL.RankedCache.Extensions;
 using IL.RankedCache.Models;
-using IL.RankedCache.Policy;
+using IL.RankedCache.Policies;
+using Microsoft.Extensions.Options;
 
 namespace IL.RankedCache.Services
 {
     /// <summary>
     /// Ranked cache service
     /// </summary>
-    /// <typeparam name="TRange">Accepts short, int and long as constraints. Will throw NotSupportedException for all other types.</typeparam>
-    public class RankedCacheService<TRange> : IRankedCacheService where TRange : struct
+    /// <typeparam name="TCacheCounterOrder">Accepts short, int and long as constraints. Will throw NotSupportedException for all other types.</typeparam>
+    internal class RankedCacheService<TCacheCounterOrder> : IRankedCacheService where TCacheCounterOrder : struct
     {
         private readonly ICacheProvider _cacheProvider;
-        private readonly RankedCachePolicy _policy = RankedCachePolicy.Default;
-        private readonly Dictionary<string, TRange> _cacheAccessCounter = new();
+        private readonly RankedCachePolicy _policy;
+        private readonly Dictionary<string, TCacheCounterOrder> _cacheAccessCounter = new();
         private Timer? _cleanupTimer;
 
         /// <summary>
         /// Default constructor will use RankedCachePolicy.Default
         /// </summary>
-        /// <param name="cacheProvider"></param>
+        /// <param name="cacheProvider">Cache provider of your choice.</param>
+        /// <param name="policy">Ranked cache policy</param>
         /// <exception cref="NotSupportedException"></exception>
-        public RankedCacheService(ICacheProvider cacheProvider)
+        internal RankedCacheService(ICacheProvider cacheProvider, IOptions<RankedCachePolicy>? policy)
         {
-            if (typeof(TRange) != typeof(short) || typeof(TRange) != typeof(int) || typeof(TRange) != typeof(long))
+            if (typeof(TCacheCounterOrder) != typeof(short) || typeof(TCacheCounterOrder) != typeof(int) || typeof(TCacheCounterOrder) != typeof(long))
             {
-                throw new NotSupportedException($"TRange of type {typeof(TRange)} is not supported.");
+                throw new NotSupportedException($"TRange of type {typeof(TCacheCounterOrder)} is not supported.");
             }
 
             _cacheProvider = cacheProvider;
+            _policy = policy?.Value ?? RankedCachePolicy.Default;
             SetupCleanupTimer();
         }
 
-        /// <summary>
-        /// Constructor which allows to specify custom RankedCachePolicy
-        /// </summary>
-        /// <param name="cacheProvider"></param>
-        /// <param name="policy"></param>
-        public RankedCacheService(ICacheProvider cacheProvider, RankedCachePolicy policy) : this(cacheProvider)
-        {
-            _policy = policy;
-        }
-
         /// <inheritdoc cref="IRankedCacheService.Add" />
-        public async Task Add<T>(string key, T obj)
+        public async Task Add<T>(string key, T? obj)
         {
-            await _cacheProvider.Add(key, obj);
-            _cacheAccessCounter[key] = (TRange)(object)0;
+            if (obj != null)
+            {
+                await _cacheProvider.Add(key, obj);
+                _cacheAccessCounter[key] = (TCacheCounterOrder)(object)0;
+            }
         }
 
         /// <inheritdoc cref="IRankedCacheService.Get" />
@@ -53,7 +50,7 @@ namespace IL.RankedCache.Services
         {
             if (_cacheAccessCounter.ContainsKey(key))
             {
-                _cacheAccessCounter[key] = Increment(_cacheAccessCounter[key]);
+                _cacheAccessCounter[key] = _cacheAccessCounter[key].Increment();
             }
 
             return await _cacheProvider.Get<T>(key);
@@ -90,7 +87,7 @@ namespace IL.RankedCache.Services
             //Reset counters on each cleanup - supposed to allow new cache entries to take over old top ranked in previous iteration
             foreach (var entryCounter in _cacheAccessCounter)
             {
-                _cacheAccessCounter[entryCounter.Key] = (TRange)(object)1;
+                _cacheAccessCounter[entryCounter.Key] = (TCacheCounterOrder)(object)1;
             }
         }
 
@@ -124,44 +121,6 @@ namespace IL.RankedCache.Services
         private void CleanupCallback(object state)
         {
             _ = Cleanup();
-        }
-
-        private static TRange Increment(TRange value)
-        {
-            if (typeof(TRange) == typeof(short))
-            {
-                var shortValue = (short)(object)value;
-                if (shortValue < short.MaxValue)
-                {
-                    shortValue++;
-                }
-
-                return (TRange)(object)shortValue;
-            }
-
-            if (typeof(TRange) == typeof(int))
-            {
-                var intValue = (int)(object)value;
-                if (intValue < int.MaxValue)
-                {
-                    intValue++;
-                }
-
-                return (TRange)(object)intValue;
-            }
-
-            if (typeof(TRange) == typeof(long))
-            {
-                var longValue = (long)(object)value;
-                if (longValue < long.MaxValue)
-                {
-                    longValue++;
-                }
-
-                return (TRange)(object)longValue;
-            }
-
-            throw new NotSupportedException($"TRange of type {typeof(TRange)} is not supported.");
         }
     }
 }

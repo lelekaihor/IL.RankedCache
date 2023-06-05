@@ -14,7 +14,7 @@ namespace IL.RankedCache.Services
         /// <param name="key">Cache key</param>
         /// <param name="obj">Object to be cached</param>
         /// <returns>Task</returns>
-        new Task Add<T>(string key, T obj);
+        new Task Add<T>(string key, T? obj);
 
         /// <summary>
         /// Get object from cache by key, automatically increases cache access counter for given key
