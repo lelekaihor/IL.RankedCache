@@ -10,7 +10,7 @@
     <Description>Generic facade over your caching mechanism allowing to keep track of how many times cache entry was accessed as well as automatic/manual cleanup of least used cache entries.</Description>
     <Copyright>Ihor Leleka</Copyright>
     <PackageProjectUrl>https://github.com/lelekaihor/IL.RankedCache</PackageProjectUrl>
-    <PackageLicenseExpression>GPL-3.0 license</PackageLicenseExpression>
+    <PackageLicenseFile>..\LICENSE</PackageLicenseFile>
     <RepositoryUrl>https://github.com/lelekaihor/IL.RankedCache</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
