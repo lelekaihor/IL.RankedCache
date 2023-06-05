@@ -23,15 +23,15 @@ namespace IL.RankedCache.Services
         /// <param name="cacheProvider">Cache provider of your choice.</param>
         /// <param name="policy">Ranked cache policy</param>
         /// <exception cref="NotSupportedException"></exception>
-        internal RankedCacheService(ICacheProvider cacheProvider, IOptions<RankedCachePolicy>? policy)
+        public RankedCacheService(ICacheProvider cacheProvider, IOptions<RankedCachePolicy> policy)
         {
-            if (typeof(TCacheCounterOrder) != typeof(short) || typeof(TCacheCounterOrder) != typeof(int) || typeof(TCacheCounterOrder) != typeof(long))
+            if (typeof(TCacheCounterOrder) != typeof(short) && typeof(TCacheCounterOrder) != typeof(int) && typeof(TCacheCounterOrder) != typeof(long))
             {
                 throw new NotSupportedException($"TRange of type {typeof(TCacheCounterOrder)} is not supported.");
             }
 
             _cacheProvider = cacheProvider;
-            _policy = policy?.Value ?? RankedCachePolicy.Default;
+            _policy = policy.Value;
             SetupCleanupTimer();
         }
 

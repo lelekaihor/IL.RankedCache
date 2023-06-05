@@ -7,7 +7,7 @@ namespace IL.RankedCache.CacheProvider
         private readonly MemoryCache _cache;
         private readonly object _lockObject;
 
-        internal DefaultCacheProvider()
+        public DefaultCacheProvider()
         {
             _cache = MemoryCache.Default;
             _lockObject = new object();

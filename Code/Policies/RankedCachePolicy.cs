@@ -4,20 +4,8 @@ namespace IL.RankedCache.Policies
 {
     public class RankedCachePolicy
     {
-        public int MaxItems { get; }
-        public CleanupMode CleanupMode { get; }
-        public TimeSpan? Frequency { get; }
-
-        public RankedCachePolicy(int maxItems, CleanupMode cleanupMode = CleanupMode.Manual, TimeSpan? frequency = null)
-        {
-            MaxItems = maxItems;
-            CleanupMode = cleanupMode;
-            if (cleanupMode == CleanupMode.Auto)
-            {
-                Frequency = frequency ?? throw new ArgumentNullException(nameof(frequency));
-            }
-        }
-
-        public static RankedCachePolicy Default => new(1000, CleanupMode.Auto, TimeSpan.FromHours(1));
+        public int MaxItems { get; set; } = 1000;
+        public CleanupMode CleanupMode { get; set; } = CleanupMode.Auto;
+        public TimeSpan? Frequency { get; set; } = TimeSpan.FromHours(1);
     }
 }
