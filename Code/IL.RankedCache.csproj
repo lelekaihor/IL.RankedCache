@@ -7,7 +7,7 @@
     <PackageVersion>1.0.1</PackageVersion>
     <Title>Ranked Cache</Title>
     <Authors>Ihor Leleka</Authors>
-    <Description>Generic facade over your caching mechanism allowing to keep track of how many times cache entry was accessed as well as automatic/manual cleanup of least used cache entries.</Description>
+    <Description>Decorator for caching mechanism of your preference allowing to keep track of how many times each entry was accessed, including some manual and automated cleanup possibilities.</Description>
     <Copyright>Ihor Leleka</Copyright>
     <PackageProjectUrl>https://github.com/lelekaihor/IL.RankedCache</PackageProjectUrl>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
