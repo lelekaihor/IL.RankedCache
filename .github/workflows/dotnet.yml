@@ -26,3 +26,9 @@ jobs:
       run: dotnet build --no-restore
     - name: Test
       run: dotnet test --no-build --verbosity normal
+    - name: Pack NuGet package
+      run: dotnet pack --no-build --configuration Release --output ./nupkg
+      if: success() && github.ref == 'refs/heads/main'
+    - name: Publish NuGet package
+      run: dotnet nuget push ./nupkg/*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }}
+      if: success() && github.ref == 'refs/heads/main'
