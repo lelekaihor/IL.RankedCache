@@ -10,7 +10,7 @@
     <Description>Generic facade over your caching mechanism allowing to keep track of how many times cache entry was accessed as well as automatic/manual cleanup of least used cache entries.</Description>
     <Copyright>Ihor Leleka</Copyright>
     <PackageProjectUrl>https://github.com/lelekaihor/IL.RankedCache</PackageProjectUrl>
-    <PackageLicenseFile>..\LICENSE</PackageLicenseFile>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <RepositoryUrl>https://github.com/lelekaihor/IL.RankedCache</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
@@ -20,6 +20,7 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="7.0.1" />
     <PackageReference Include="System.Runtime.Caching" Version="7.0.0" />
+    <None Include="LICENSE" Pack="true" PackagePath="$(PackageLicenseFile)"/>
   </ItemGroup>
 
 </Project>
