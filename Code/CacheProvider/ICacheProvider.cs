@@ -2,7 +2,7 @@
 {
     public interface ICacheProvider
     {
-        Task Add<T>(string key, T? obj);
+        Task Add<T>(string key, T? obj, DateTimeOffset? absoluteExpiration = null);
 
         Task<T> Get<T>(string key);
 

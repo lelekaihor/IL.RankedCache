@@ -13,13 +13,13 @@ namespace IL.RankedCache.CacheProvider
             _lockObject = new object();
         }
 
-        public Task Add<T>(string key, T? obj)
+        public Task Add<T>(string key, T? obj, DateTimeOffset? absoluteExpiration = null)
         {
             lock (_lockObject)
             {
                 if (obj != null)
                 {
-                    _cache.Set(key, obj, DateTimeOffset.MaxValue);
+                    _cache.Set(key, obj, absoluteExpiration ?? DateTimeOffset.MaxValue);
                 }
             }
 

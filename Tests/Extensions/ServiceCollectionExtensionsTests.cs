@@ -73,7 +73,7 @@ namespace IL.RankedCache.Tests.Extensions
 
         public class CustomCacheProvider : ICacheProvider
         {
-            public Task Add<T>(string key, T? obj)
+            public Task Add<T>(string key, T? obj, DateTimeOffset? absoluteExpiration)
             {
                 throw new NotImplementedException();
             }

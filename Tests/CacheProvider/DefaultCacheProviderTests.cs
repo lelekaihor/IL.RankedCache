@@ -19,11 +19,9 @@ public class DefaultCacheProviderTests
         // Arrange
         var key = "Add_WithNonNullObject_ShouldAddObjectToCache";
         var obj = new TestObject();
-        MemoryCache.Default.Trim(100);
 
         // Act
         await _cacheProvider.Add(key, obj);
-
         // Assert
         Assert.True(MemoryCache.Default.Contains(key));
     }
@@ -34,7 +32,6 @@ public class DefaultCacheProviderTests
         // Arrange
         var key = "Add_WithNullObject_ShouldNotAddObjectToCache";
         TestObject? obj = null;
-        MemoryCache.Default.Trim(100);
 
         // Act
         await _cacheProvider.Add(key, obj);
@@ -49,7 +46,6 @@ public class DefaultCacheProviderTests
         // Arrange
         var key = "Get_WithExistingKey_ShouldReturnObjectFromCache";
         var obj = new TestObject();
-        MemoryCache.Default.Trim(100);
 
         MemoryCache.Default.Set(key, obj, DateTimeOffset.MaxValue);
 
@@ -65,7 +61,6 @@ public class DefaultCacheProviderTests
     {
         // Arrange
         var key = "Get_WithNonExistingKey_ShouldReturnNull";
-        MemoryCache.Default.Trim(100);
 
         // Act
         var result = await _cacheProvider.Get<TestObject>(key);
@@ -80,7 +75,6 @@ public class DefaultCacheProviderTests
         // Arrange
         var key = "Delete_WithExistingKey_ShouldRemoveObjectFromCache";
         var obj = new TestObject();
-        MemoryCache.Default.Trim(100);
 
         MemoryCache.Default.Set(key, obj, DateTimeOffset.MaxValue);
 
@@ -99,7 +93,6 @@ public class DefaultCacheProviderTests
         var expectedResult = true;
 
         var obj = new TestObject();
-        MemoryCache.Default.Trim(100);
 
         MemoryCache.Default.Set(key, obj, DateTimeOffset.MaxValue);
 
@@ -120,7 +113,6 @@ public class DefaultCacheProviderTests
         var nonExistingKey = "nonExistingKey";
 
         var obj = new TestObject();
-        MemoryCache.Default.Trim(100);
 
         MemoryCache.Default.Set(key, obj, DateTimeOffset.MaxValue);
 
@@ -129,6 +121,21 @@ public class DefaultCacheProviderTests
 
         // Assert
         Assert.Equal(expectedResult, result);
+    }
+
+    [Fact]
+    public async Task Add_WithExpiration_WithNonNullObject_ShouldDeleteObject_When_Expired()
+    {
+        // Arrange
+        var key = "    public async Task Add_WithExpiration_WithNonNullObject_ShouldDeleteObject_When_Expired()\r\n";
+        var obj = new TestObject();
+
+        // Act
+        await _cacheProvider.Add(key, obj, DateTimeOffset.Now.AddSeconds(3));
+        // Assert
+        Assert.True(MemoryCache.Default.Contains(key));
+        Thread.Sleep(4000);
+        Assert.False(MemoryCache.Default.Contains(key));
     }
 
     // Helper class for testing

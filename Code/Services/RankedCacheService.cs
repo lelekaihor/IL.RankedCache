@@ -36,11 +36,11 @@ namespace IL.RankedCache.Services
         }
 
         /// <inheritdoc cref="IRankedCacheService.Add" />
-        public async Task Add<T>(string key, T? obj)
+        public async Task Add<T>(string key, T? obj, DateTimeOffset? absoluteExpiration = null)
         {
             if (obj != null)
             {
-                await _cacheProvider.Add(key, obj);
+                await _cacheProvider.Add(key, obj, absoluteExpiration);
                 _cacheAccessCounter[key] = (TCacheCounterOrder)(object)0;
             }
         }
@@ -48,12 +48,18 @@ namespace IL.RankedCache.Services
         /// <inheritdoc cref="IRankedCacheService.Get" />
         public async Task<T> Get<T>(string key)
         {
-            if (_cacheAccessCounter.ContainsKey(key))
+            if (HasKey(key))
             {
                 _cacheAccessCounter[key] = _cacheAccessCounter[key].Increment();
             }
 
-            return await _cacheProvider.Get<T>(key);
+            var result = await _cacheProvider.Get<T>(key);
+            if (result == null)
+            {
+                _cacheAccessCounter.Remove(key);
+            }
+
+            return result;
         }
 
         /// <inheritdoc cref="IRankedCacheService.Delete" />

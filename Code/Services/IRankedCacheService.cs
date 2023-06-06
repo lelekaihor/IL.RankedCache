@@ -13,8 +13,9 @@ namespace IL.RankedCache.Services
         /// <typeparam name="T">Object type</typeparam>
         /// <param name="key">Cache key</param>
         /// <param name="obj">Object to be cached</param>
+        /// <param name="absoluteExpiration">Optional expiration parameter</param>
         /// <returns>Task</returns>
-        new Task Add<T>(string key, T? obj);
+        new Task Add<T>(string key, T? obj, DateTimeOffset? absoluteExpiration = null);
 
         /// <summary>
         /// Get object from cache by key, automatically increases cache access counter for given key
