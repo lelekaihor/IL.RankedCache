@@ -217,6 +217,42 @@ namespace IL.RankedCache.Tests.Services
             cacheProviderMock.Verify(mock => mock.Delete("key3"), Times.Once);
             cacheProviderMock.Verify(mock => mock.Delete("key6"), Times.Once);
         }
+
+        [Fact]
+        public void Cleanup_AutomatedMode_RemovesExcessEntries_ExcludingReserved_CallsCacheProviderDelete()
+        {
+            // Arrange
+            var cacheProviderMock = new Mock<ICacheProvider>();
+            var policy = Options.Create(new RankedCachePolicy
+            {
+                MaxItems = 5,
+                CleanupMode = CleanupMode.Auto,
+                Frequency = TimeSpan.FromSeconds(3),
+                ReservedEntries = new[] { "key3" }
+            });
+            var rankedCacheService = new RankedCacheService<int>(cacheProviderMock.Object, policy);
+            var testObject = "test";
+            var cacheAccessCounter = new Dictionary<string, int>
+            {
+                { "key1", 5 },
+                { "key2", 3 },
+                { "key3", 2 },
+                { "key4", 7 },
+                { "key5", 4 },
+                { "key6", 1 },
+                { "key7", 6 }
+            };
+            rankedCacheService.SetCacheAccessCounter(cacheAccessCounter, testObject, cacheProviderMock);
+
+            // Act
+            Thread.Sleep(TimeSpan.FromSeconds(3));
+            //Should perform cleanup automatically
+            Thread.Sleep(TimeSpan.FromSeconds(1));
+
+            // Assert
+            cacheProviderMock.Verify(mock => mock.Delete(It.IsAny<string>()), Times.Exactly(1));
+            cacheProviderMock.Verify(mock => mock.Delete("key6"), Times.Once);
+        }
     }
 
     internal static class RankedCacheServiceExtensions

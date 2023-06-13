@@ -4,10 +4,26 @@ namespace IL.RankedCache.Policies
 {
     public class RankedCachePolicy
     {
+        /// <summary>
+        /// Limits maximum amount of items cache provider can keep after cleanup
+        /// </summary>
         public int MaxItems { get; set; } = 1000;
+
+        /// <summary>
+        /// Reserved keys that are not going to be affected by cleanup
+        /// </summary>
+        public string[]? ReservedEntries { get; set; } = null;
+
+        /// <summary>
+        /// Option to add custom suffix to all cache entries - might be helpful if reusing same caching provider for different tiers
+        /// </summary>
+        public string EnvironmentSuffix { get; set; } = string.Empty;
 
         private CleanupMode _cleanupMode = CleanupMode.Auto;
 
+        /// <summary>
+        /// Cleanup mode defines how Cleanup is going to be executed. If frequency is not yet set will be instantiated with default value (1h)
+        /// </summary>
         public CleanupMode CleanupMode
         {
             get => _cleanupMode;
@@ -24,6 +40,9 @@ namespace IL.RankedCache.Policies
 
         private TimeSpan? _frequency = TimeSpan.FromHours(1);
 
+        /// <summary>
+        /// Frequency of cleanup executions. Must be set if service expected to be used in Auto mode
+        /// </summary>
         public TimeSpan? Frequency
         {
             get => _frequency;

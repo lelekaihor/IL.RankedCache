@@ -40,8 +40,8 @@ namespace IL.RankedCache.Services
         {
             if (obj != null)
             {
-                await _cacheProvider.Add(key, obj, absoluteExpiration);
-                _cacheAccessCounter[key] = (TCacheCounterOrder)(object)0;
+                await _cacheProvider.Add(KeyWithSuffix(key), obj, absoluteExpiration);
+                _cacheAccessCounter[KeyWithSuffix(key)] = (TCacheCounterOrder)(object)0;
             }
         }
 
@@ -50,13 +50,13 @@ namespace IL.RankedCache.Services
         {
             if (HasKey(key))
             {
-                _cacheAccessCounter[key] = _cacheAccessCounter[key].Increment();
+                _cacheAccessCounter[key] = _cacheAccessCounter[KeyWithSuffix(key)].Increment();
             }
 
-            var result = await _cacheProvider.Get<T>(key);
+            var result = await _cacheProvider.Get<T>(KeyWithSuffix(key));
             if (result == null)
             {
-                _cacheAccessCounter.Remove(key);
+                _cacheAccessCounter.Remove(KeyWithSuffix(key));
             }
 
             return result;
@@ -65,14 +65,14 @@ namespace IL.RankedCache.Services
         /// <inheritdoc cref="IRankedCacheService.Delete" />
         public async Task Delete(string key)
         {
-            await _cacheProvider.Delete(key);
-            _cacheAccessCounter.Remove(key);
+            await _cacheProvider.Delete(KeyWithSuffix(key));
+            _cacheAccessCounter.Remove(KeyWithSuffix(key));
         }
 
         /// <inheritdoc cref="IRankedCacheService.HasKey" />
         public bool HasKey(string key)
         {
-            return _cacheAccessCounter.ContainsKey(key);
+            return _cacheAccessCounter.ContainsKey(KeyWithSuffix(key));
         }
 
         /// <inheritdoc cref="IRankedCacheService.Cleanup" />
@@ -81,6 +81,7 @@ namespace IL.RankedCache.Services
             if (_cacheAccessCounter.Count > _policy.MaxItems)
             {
                 var entriesToRemove = _cacheAccessCounter
+                    .ExcludeReservedEntries(_policy.ReservedEntries)
                     .OrderByDescending(kvp => kvp.Value)
                     .Skip(_policy.MaxItems)
                     .Select(kvp => kvp.Key)
@@ -102,7 +103,7 @@ namespace IL.RankedCache.Services
 
         public TCacheCounterOrder? GetCacheAccessCounter(string key)
         {
-            return HasKey(key) ? _cacheAccessCounter[key] : null;
+            return HasKey(key) ? _cacheAccessCounter[KeyWithSuffix(key)] : null;
         }
 
         public void Dispose()
@@ -135,6 +136,11 @@ namespace IL.RankedCache.Services
         private void CleanupCallback(object state)
         {
             _ = Cleanup();
+        }
+
+        private string KeyWithSuffix(string key)
+        {
+            return key + _policy.EnvironmentSuffix;
         }
     }
 }
