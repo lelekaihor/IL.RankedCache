@@ -14,11 +14,12 @@
     <RepositoryUrl>https://github.com/lelekaihor/IL.RankedCache</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <PackageReadmeFile>content/Readme.md</PackageReadmeFile>
+    <PackageReadmeFile>Readme.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
     <None Include="LICENSE.txt" Pack="true" Visible="false" PackagePath="" />
+    <None Include="Readme.md" Pack="true" Visible="false" PackagePath="" />
   </ItemGroup>
   
   <ItemGroup Condition=" '$(TargetFramework)' == 'net6.0' ">
