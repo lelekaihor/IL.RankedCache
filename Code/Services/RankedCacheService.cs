@@ -1,4 +1,5 @@
-﻿using IL.RankedCache.CacheProvider;
+﻿using IL.RankedCache.CacheAccessCounter;
+using IL.RankedCache.CacheProvider;
 using IL.RankedCache.Extensions;
 using IL.RankedCache.Models;
 using IL.RankedCache.Policies;
@@ -14,16 +15,17 @@ namespace IL.RankedCache.Services
     {
         private readonly ICacheProvider _cacheProvider;
         private readonly RankedCachePolicy _policy;
-        private readonly Dictionary<string, TCacheCounterOrder> _cacheAccessCounter = new();
+        private readonly ICacheAccessCounter<TCacheCounterOrder> _cacheAccessCounter;
         private Timer? _cleanupTimer;
 
         /// <summary>
         /// Default constructor will use RankedCachePolicy.Default
         /// </summary>
         /// <param name="cacheProvider">Cache provider of your choice.</param>
+        /// <param name="cacheAccessCounter">Cache access counter</param>
         /// <param name="policy">Ranked cache policy</param>
         /// <exception cref="NotSupportedException"></exception>
-        public RankedCacheService(ICacheProvider cacheProvider, IOptions<RankedCachePolicy> policy)
+        public RankedCacheService(ICacheProvider cacheProvider, ICacheAccessCounter<TCacheCounterOrder> cacheAccessCounter, IOptions<RankedCachePolicy> policy)
         {
             if (typeof(TCacheCounterOrder) != typeof(short) && typeof(TCacheCounterOrder) != typeof(int) && typeof(TCacheCounterOrder) != typeof(long))
             {
@@ -31,6 +33,7 @@ namespace IL.RankedCache.Services
             }
 
             _cacheProvider = cacheProvider;
+            _cacheAccessCounter = cacheAccessCounter;
             _policy = policy.Value;
             SetupCleanupTimer();
         }
@@ -78,6 +81,11 @@ namespace IL.RankedCache.Services
         /// <inheritdoc cref="IRankedCacheService.Cleanup" />
         public async Task Cleanup()
         {
+            if (_policy.CachingType == CachingType.DistributedSubscriber)
+            {
+                return;
+            }
+
             if (_cacheAccessCounter.Count > _policy.MaxItems)
             {
                 var entriesToRemove = _cacheAccessCounter
@@ -113,7 +121,7 @@ namespace IL.RankedCache.Services
 
         private void SetupCleanupTimer()
         {
-            if (_policy.CleanupMode == CleanupMode.Auto)
+            if (_policy.CleanupMode == CleanupMode.Auto && _policy.CachingType == CachingType.SingleInstance || _policy.CachingType == CachingType.DistributedProcessing)
             {
                 _cleanupTimer = new Timer(CleanupCallback!, null, GetInitialDelay(_policy.Frequency!.Value), _policy.Frequency!.Value);
             }

@@ -19,6 +19,13 @@ namespace IL.RankedCache.Policies
         /// </summary>
         public string EnvironmentSuffix { get; set; } = string.Empty;
 
+        /// <summary>
+        /// Caching type defines where counters are to be stored. Single instance stores counter internally, while Distributed are storing inside caching provider itself.
+        /// Distributed processing is role that will perform Cleanups, DistributedSubscriber can only perform caching operations and increase counters.
+        /// Default value is SingleInstance.
+        /// </summary>
+        public CachingType CachingType { get; set; } = CachingType.SingleInstance;
+
         private CleanupMode _cleanupMode = CleanupMode.Auto;
 
         /// <summary>

@@ -1,4 +1,5 @@
-﻿using IL.RankedCache.CacheProvider;
+﻿using IL.RankedCache.CacheAccessCounter;
+using IL.RankedCache.CacheProvider;
 using IL.RankedCache.Models;
 using IL.RankedCache.Policies;
 using IL.RankedCache.Services;
@@ -16,7 +17,7 @@ namespace IL.RankedCache.Tests.Services
             // Arrange
             var cacheProviderMock = new Mock<ICacheProvider>();
             var policy = Options.Create(new RankedCachePolicy());
-            var rankedCacheService = new RankedCacheService<int>(cacheProviderMock.Object, policy);
+            var rankedCacheService = new RankedCacheService<int>(cacheProviderMock.Object, new InternalCacheAccessCounter<int>(), policy);
             var key = "testKey";
             var value = "testValue";
 
@@ -33,7 +34,7 @@ namespace IL.RankedCache.Tests.Services
             // Arrange
             var cacheProviderMock = new Mock<ICacheProvider>();
             var policy = Options.Create(new RankedCachePolicy());
-            var rankedCacheService = new RankedCacheService<int>(cacheProviderMock.Object, policy);
+            var rankedCacheService = new RankedCacheService<int>(cacheProviderMock.Object, new InternalCacheAccessCounter<int>(), policy);
             var key = "testKey";
             var value = "testValue";
 
@@ -51,7 +52,7 @@ namespace IL.RankedCache.Tests.Services
             // Arrange
             var cacheProviderMock = new Mock<ICacheProvider>();
             var policy = Options.Create(new RankedCachePolicy());
-            var rankedCacheService = new RankedCacheService<int>(cacheProviderMock.Object, policy);
+            var rankedCacheService = new RankedCacheService<int>(cacheProviderMock.Object, new InternalCacheAccessCounter<int>(), policy);
             var key = "testKey";
             var value = "testValue";
             cacheProviderMock.Setup(x => x.Get<string>(key)).ReturnsAsync(value);
@@ -71,7 +72,7 @@ namespace IL.RankedCache.Tests.Services
             // Arrange
             var cacheProviderMock = new Mock<ICacheProvider>();
             var policy = Options.Create(new RankedCachePolicy());
-            var rankedCacheService = new RankedCacheService<int>(cacheProviderMock.Object, policy);
+            var rankedCacheService = new RankedCacheService<int>(cacheProviderMock.Object, new InternalCacheAccessCounter<int>(), policy);
             var key = "testKey";
             var value = "testValue";
 
@@ -97,7 +98,7 @@ namespace IL.RankedCache.Tests.Services
             // Arrange
             var cacheProviderMock = new Mock<ICacheProvider>();
             var policy = Options.Create(new RankedCachePolicy());
-            var rankedCacheService = new RankedCacheService<int>(cacheProviderMock.Object, policy);
+            var rankedCacheService = new RankedCacheService<int>(cacheProviderMock.Object, new InternalCacheAccessCounter<int>(), policy);
             var key = "testKey";
             var value = "testValue";
             await rankedCacheService.Add(key, value);
@@ -116,7 +117,7 @@ namespace IL.RankedCache.Tests.Services
             // Arrange
             var cacheProviderMock = new Mock<ICacheProvider>();
             var policy = Options.Create(new RankedCachePolicy());
-            var rankedCacheService = new RankedCacheService<int>(cacheProviderMock.Object, policy);
+            var rankedCacheService = new RankedCacheService<int>(cacheProviderMock.Object, new InternalCacheAccessCounter<int>(), policy);
             var existingKey = "testKey";
             var value = "testValue";
             var nonExistingKey = "nonExistingKey";
@@ -135,7 +136,7 @@ namespace IL.RankedCache.Tests.Services
             // Arrange
             var cacheProviderMock = new Mock<ICacheProvider>();
             var policy = Options.Create(new RankedCachePolicy { MaxItems = 5 });
-            var rankedCacheService = new RankedCacheService<int>(cacheProviderMock.Object, policy);
+            var rankedCacheService = new RankedCacheService<int>(cacheProviderMock.Object, new InternalCacheAccessCounter<int>(), policy);
             var testObject = "test";
             var cacheAccessCounter = new Dictionary<string, int>
         {
@@ -164,7 +165,7 @@ namespace IL.RankedCache.Tests.Services
             // Arrange
             var cacheProviderMock = new Mock<ICacheProvider>();
             var policy = Options.Create(new RankedCachePolicy { MaxItems = 5 });
-            var rankedCacheService = new RankedCacheService<int>(cacheProviderMock.Object, policy);
+            var rankedCacheService = new RankedCacheService<int>(cacheProviderMock.Object, new InternalCacheAccessCounter<int>(), policy);
             var testObject = "test";
             var cacheAccessCounter = new Dictionary<string, int>
         {
@@ -193,7 +194,7 @@ namespace IL.RankedCache.Tests.Services
             // Arrange
             var cacheProviderMock = new Mock<ICacheProvider>();
             var policy = Options.Create(new RankedCachePolicy { MaxItems = 5, CleanupMode = CleanupMode.Auto, Frequency = TimeSpan.FromSeconds(3) });
-            var rankedCacheService = new RankedCacheService<int>(cacheProviderMock.Object, policy);
+            var rankedCacheService = new RankedCacheService<int>(cacheProviderMock.Object, new InternalCacheAccessCounter<int>(), policy);
             var testObject = "test";
             var cacheAccessCounter = new Dictionary<string, int>
             {
@@ -230,7 +231,7 @@ namespace IL.RankedCache.Tests.Services
                 Frequency = TimeSpan.FromSeconds(3),
                 ReservedEntries = new[] { "key3" }
             });
-            var rankedCacheService = new RankedCacheService<int>(cacheProviderMock.Object, policy);
+            var rankedCacheService = new RankedCacheService<int>(cacheProviderMock.Object, new InternalCacheAccessCounter<int>(), policy);
             var testObject = "test";
             var cacheAccessCounter = new Dictionary<string, int>
             {

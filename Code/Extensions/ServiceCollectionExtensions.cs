@@ -1,4 +1,6 @@
-﻿using IL.RankedCache.CacheProvider;
+﻿using IL.RankedCache.CacheAccessCounter;
+using IL.RankedCache.CacheProvider;
+using IL.RankedCache.Models;
 using IL.RankedCache.Policies;
 using IL.RankedCache.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,9 +20,7 @@ namespace IL.RankedCache.Extensions
                 throw new NotSupportedException($"TRange of type {typeof(TCacheCounterOrder)} is not supported.");
             }
 
-            services.Configure(options ?? (_ => { }));
-            services.AddSingleton<ICacheProvider, DefaultCacheProvider>();
-            services.AddSingleton<IRankedCacheService<TCacheCounterOrder>, RankedCacheService<TCacheCounterOrder>>();
+            RegisterDependencies<TCacheCounterOrder, DefaultCacheProvider>(services, options);
         }
 
         /// <summary>
@@ -37,9 +37,27 @@ namespace IL.RankedCache.Extensions
                 throw new NotSupportedException($"TRange of type {typeof(TCacheCounterOrder)} is not supported.");
             }
 
+            RegisterDependencies<TCacheCounterOrder, TCacheProvider>(services, options);
+        }
+
+        private static void RegisterDependencies<TCacheCounterOrder, TCacheProvider>(IServiceCollection services, Action<RankedCachePolicy>? options)
+            where TCacheCounterOrder : struct
+            where TCacheProvider : class, ICacheProvider
+        {
+            RankedCachePolicy rankedCachePolicy = new();
+            options?.Invoke(rankedCachePolicy);
             services.Configure(options ?? (_ => { }));
+
             services.AddSingleton<ICacheProvider, TCacheProvider>();
             services.AddSingleton<IRankedCacheService<TCacheCounterOrder>, RankedCacheService<TCacheCounterOrder>>();
+            if (rankedCachePolicy.CachingType == CachingType.SingleInstance)
+            {
+                services.AddSingleton<ICacheAccessCounter<TCacheCounterOrder>, InternalCacheAccessCounter<TCacheCounterOrder>>();
+            }
+            else
+            {
+                services.AddSingleton<ICacheAccessCounter<TCacheCounterOrder>, DistributedCacheAccessCounter<TCacheCounterOrder>>();
+            }
         }
     }
 }
