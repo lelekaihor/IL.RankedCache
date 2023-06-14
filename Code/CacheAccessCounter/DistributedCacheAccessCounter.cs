@@ -5,7 +5,7 @@ namespace IL.RankedCache.CacheAccessCounter
 {
     internal class DistributedCacheAccessCounter<TCacheCounterOrder> : ICacheAccessCounter<TCacheCounterOrder> where TCacheCounterOrder : struct
     {
-        private const string CounterSuffix = "_Count";
+        private const string CounterSuffix = "_count";
         private readonly ICacheProvider _cacheProvider;
         private readonly HashSet<string> _counterNames = new();
         public int Count => _counterNames.Count;
@@ -39,7 +39,7 @@ namespace IL.RankedCache.CacheAccessCounter
         {
             foreach (var counterName in _counterNames)
             {
-                _cacheProvider.Delete(counterName).RunSynchronously();
+                _cacheProvider.Delete(counterName).Wait();
             }
             _counterNames.Clear();
         }
@@ -57,7 +57,7 @@ namespace IL.RankedCache.CacheAccessCounter
         public bool Remove(KeyValuePair<string, TCacheCounterOrder> item)
         {
             var composedKey = KeyWithSuffix(item.Key);
-            _cacheProvider.Delete(composedKey).RunSynchronously();
+            _cacheProvider.Delete(composedKey).Wait();
             return _counterNames.Remove(composedKey);
         }
 
@@ -76,7 +76,7 @@ namespace IL.RankedCache.CacheAccessCounter
         public bool Remove(string key)
         {
             var composedKey = KeyWithSuffix(key);
-            _cacheProvider.Delete(composedKey).RunSynchronously();
+            _cacheProvider.Delete(composedKey).Wait();
             return _counterNames.Remove(composedKey);
         }
 
@@ -95,9 +95,9 @@ namespace IL.RankedCache.CacheAccessCounter
                 var composedKey = KeyWithSuffix(key);
                 if (_cacheProvider.HasKey(composedKey))
                 {
-                    _cacheProvider.Delete(composedKey).RunSynchronously();
+                    _cacheProvider.Delete(composedKey).Wait();
                 }
-                _cacheProvider.Add(composedKey, value).RunSynchronously();
+                _cacheProvider.Add(composedKey, value).Wait();
                 _counterNames.Add(composedKey);
             }
         }
