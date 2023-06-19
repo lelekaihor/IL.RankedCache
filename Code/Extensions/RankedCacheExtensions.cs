@@ -8,8 +8,8 @@ namespace IL.RankedCache.Extensions
         public static T GetOrAdd<T, TCacheCounterOrder>(this IRankedCacheService<TCacheCounterOrder> rankedCacheService,
             string key,
             Func<T> valueFactory,
-            Func<T, bool> cacheCreationCondition,
-            DateTimeOffset? absoluteExpiration) where TCacheCounterOrder : struct
+            Func<T, bool>? cacheCreationCondition,
+            DateTimeOffset? absoluteExpiration = null) where TCacheCounterOrder : struct
         {
             using (LockManager.GetLock(key))
             {
@@ -29,7 +29,7 @@ namespace IL.RankedCache.Extensions
         public static T GetOrAdd<T, TCacheCounterOrder>(this IRankedCacheService<TCacheCounterOrder> rankedCacheService,
             string key,
             Func<Task<T>> valueFactory,
-            Func<T, bool> cacheCreationCondition,
+            Func<T, bool>? cacheCreationCondition,
             DateTimeOffset? absoluteExpiration) where TCacheCounterOrder : struct
         {
             using (LockManager.GetLock(key))
@@ -48,9 +48,9 @@ namespace IL.RankedCache.Extensions
         }
 
         private static void AddCacheEntryIfJustified<T, TCacheCounterOrder>(IRankedCacheService<TCacheCounterOrder> rankedCacheService, string key,
-            T value, Func<T, bool> cacheCreationCondition, DateTimeOffset? absoluteExpiration) where TCacheCounterOrder : struct
+            T value, Func<T, bool>? cacheCreationCondition, DateTimeOffset? absoluteExpiration) where TCacheCounterOrder : struct
         {
-            if (cacheCreationCondition(value))
+            if (cacheCreationCondition is null || cacheCreationCondition(value))
             {
                 rankedCacheService.Add(key, value, absoluteExpiration).Wait();
             }
@@ -59,7 +59,7 @@ namespace IL.RankedCache.Extensions
         public static async Task<T> GetOrAddAsync<T, TCacheCounterOrder>(this IRankedCacheService<TCacheCounterOrder> rankedCacheService,
             string key,
             Func<T> valueFactory,
-            Func<T, bool> cacheCreationCondition,
+            Func<T, bool>? cacheCreationCondition,
             DateTimeOffset? absoluteExpiration) where TCacheCounterOrder : struct
         {
             using (await LockManager.GetLockAsync(key))
@@ -80,7 +80,7 @@ namespace IL.RankedCache.Extensions
         public static async Task<T> GetOrAddAsync<T, TCacheCounterOrder>(this IRankedCacheService<TCacheCounterOrder> rankedCacheService,
             string key,
             Func<Task<T>> valueFactory,
-            Func<T, bool> cacheCreationCondition,
+            Func<T, bool>? cacheCreationCondition,
             DateTimeOffset? absoluteExpiration) where TCacheCounterOrder : struct
         {
             using (await LockManager.GetLockAsync(key))
@@ -99,9 +99,9 @@ namespace IL.RankedCache.Extensions
         }
 
         private static async Task AddCacheEntryIfJustifiedAsync<T, TCacheCounterOrder>(IRankedCacheService<TCacheCounterOrder> rankedCacheService, string key,
-            T value, Func<T, bool> cacheCreationCondition, DateTimeOffset? absoluteExpiration) where TCacheCounterOrder : struct
+            T value, Func<T, bool>? cacheCreationCondition, DateTimeOffset? absoluteExpiration) where TCacheCounterOrder : struct
         {
-            if (cacheCreationCondition(value))
+            if (cacheCreationCondition is null || cacheCreationCondition(value))
             {
                 await rankedCacheService.Add(key, value, absoluteExpiration);
             }
