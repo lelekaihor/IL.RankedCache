@@ -15,7 +15,17 @@ namespace IL.RankedCache.Services
         /// <param name="obj">Object to be cached</param>
         /// <param name="absoluteExpiration">Optional expiration parameter</param>
         /// <returns>Task</returns>
-        new Task Add<T>(string key, T? obj, DateTimeOffset? absoluteExpiration = null);
+        new void Add<T>(string key, T? obj, DateTimeOffset? absoluteExpiration = null);
+
+        /// <summary>
+        /// (async)Add object to cache, start tracking object access count
+        /// </summary>
+        /// <typeparam name="T">Object type</typeparam>
+        /// <param name="key">Cache key</param>
+        /// <param name="obj">Object to be cached</param>
+        /// <param name="absoluteExpiration">Optional expiration parameter</param>
+        /// <returns>Task</returns>
+        new Task AddAsync<T>(string key, T? obj, DateTimeOffset? absoluteExpiration = null);
 
         /// <summary>
         /// Get object from cache by key, automatically increases cache access counter for given key
@@ -23,14 +33,29 @@ namespace IL.RankedCache.Services
         /// <typeparam name="T">Object type</typeparam>
         /// <param name="key">Cache key</param>
         /// <returns>Object of type specified in constraint</returns>
-        new Task<T> Get<T>(string key);
+        new T Get<T>(string key);
+
+        /// <summary>
+        /// (async)Get object from cache by key, automatically increases cache access counter for given key
+        /// </summary>
+        /// <typeparam name="T">Object type</typeparam>
+        /// <param name="key">Cache key</param>
+        /// <returns>Object of type specified in constraint</returns>
+        new Task<T> GetAsync<T>(string key);
 
         /// <summary>
         /// Delete object from cache, automatically deletes corresponding entry in cache access counter
         /// </summary>
         /// <param name="key">Cache key</param>
         /// <returns>Task</returns>
-        new Task Delete(string key);
+        new void Delete(string key);
+
+        /// <summary>
+        /// (async)Delete object from cache, automatically deletes corresponding entry in cache access counter
+        /// </summary>
+        /// <param name="key">Cache key</param>
+        /// <returns>Task</returns>
+        new Task DeleteAsync(string key);
 
         /// <summary>
         /// Check if cache has such key
@@ -40,7 +65,7 @@ namespace IL.RankedCache.Services
         new bool HasKey(string key);
 
         /// <summary>
-        /// Task to cleanup cache entries according to MaxItems specified in RankedCachePolicy, resets all counters for remaining objects
+        /// (async)Task to cleanup cache entries according to MaxItems specified in RankedCachePolicy, resets all counters for remaining objects
         /// </summary>
         /// <returns>Task</returns>
         Task Cleanup();

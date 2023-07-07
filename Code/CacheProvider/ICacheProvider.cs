@@ -2,11 +2,17 @@
 {
     public interface ICacheProvider
     {
-        Task Add<T>(string key, T? obj, DateTimeOffset? absoluteExpiration = null);
+        void Add<T>(string key, T? obj, DateTimeOffset? absoluteExpiration = null);
 
-        Task<T> Get<T>(string key);
+        Task AddAsync<T>(string key, T? obj, DateTimeOffset? absoluteExpiration = null);
 
-        Task Delete(string key);
+        T Get<T>(string key);
+
+        Task<T> GetAsync<T>(string key);
+
+        void Delete(string key);
+
+        Task DeleteAsync(string key);
 
         bool HasKey(string key);
     }

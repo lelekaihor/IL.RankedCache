@@ -38,25 +38,35 @@ namespace IL.RankedCache.Services
             SetupCleanupTimer();
         }
 
-        /// <inheritdoc cref="IRankedCacheService.Add" />
-        public async Task Add<T>(string key, T? obj, DateTimeOffset? absoluteExpiration = null)
+        /// <inheritdoc cref="IRankedCacheService{TCacheCounterOrder}.Add{T}" />
+        public void Add<T>(string key, T? obj, DateTimeOffset? absoluteExpiration = null)
         {
             if (obj != null)
             {
-                await _cacheProvider.Add(KeyWithSuffix(key), obj, absoluteExpiration);
+                _cacheProvider.Add(KeyWithSuffix(key), obj, absoluteExpiration);
                 _cacheAccessCounter[KeyWithSuffix(key)] = (TCacheCounterOrder)(object)0;
             }
         }
 
-        /// <inheritdoc cref="IRankedCacheService.Get" />
-        public async Task<T> Get<T>(string key)
+        /// <inheritdoc cref="IRankedCacheService{TCacheCounterOrder}.AddAsync{T}" />
+        public async Task AddAsync<T>(string key, T? obj, DateTimeOffset? absoluteExpiration = null)
+        {
+            if (obj != null)
+            {
+                await _cacheProvider.AddAsync(KeyWithSuffix(key), obj, absoluteExpiration);
+                _cacheAccessCounter[KeyWithSuffix(key)] = (TCacheCounterOrder)(object)0;
+            }
+        }
+
+        /// <inheritdoc cref="IRankedCacheService{TCacheCounterOrder}.Get{T}" />
+        public T Get<T>(string key)
         {
             if (HasKey(key))
             {
                 _cacheAccessCounter[key] = _cacheAccessCounter[KeyWithSuffix(key)].Increment();
             }
 
-            var result = await _cacheProvider.Get<T>(KeyWithSuffix(key));
+            var result = _cacheProvider.Get<T>(KeyWithSuffix(key));
             if (result == null)
             {
                 _cacheAccessCounter.Remove(KeyWithSuffix(key));
@@ -65,20 +75,44 @@ namespace IL.RankedCache.Services
             return result;
         }
 
-        /// <inheritdoc cref="IRankedCacheService.Delete" />
-        public async Task Delete(string key)
+        /// <inheritdoc cref="IRankedCacheService{TCacheCounterOrder}.GetAsync{T}" />
+        public async Task<T> GetAsync<T>(string key)
         {
-            await _cacheProvider.Delete(KeyWithSuffix(key));
+            if (HasKey(key))
+            {
+                _cacheAccessCounter[key] = _cacheAccessCounter[KeyWithSuffix(key)].Increment();
+            }
+
+            var result = await _cacheProvider.GetAsync<T>(KeyWithSuffix(key));
+            if (result == null)
+            {
+                _cacheAccessCounter.Remove(KeyWithSuffix(key));
+            }
+
+            return result;
+        }
+
+        /// <inheritdoc cref="IRankedCacheService{TCacheCounterOrder}.Delete" />
+        public void Delete(string key)
+        {
+            _cacheProvider.Delete(KeyWithSuffix(key));
             _cacheAccessCounter.Remove(KeyWithSuffix(key));
         }
 
-        /// <inheritdoc cref="IRankedCacheService.HasKey" />
+        /// <inheritdoc cref="IRankedCacheService{TCacheCounterOrder}.DeleteAsync" />
+        public async Task DeleteAsync(string key)
+        {
+            await _cacheProvider.DeleteAsync(KeyWithSuffix(key));
+            _cacheAccessCounter.Remove(KeyWithSuffix(key));
+        }
+
+        /// <inheritdoc cref="IRankedCacheService{TCacheCounterOrder}.HasKey" />
         public bool HasKey(string key)
         {
             return _cacheAccessCounter.ContainsKey(KeyWithSuffix(key));
         }
 
-        /// <inheritdoc cref="IRankedCacheService.Cleanup" />
+        /// <inheritdoc cref="IRankedCacheService{TCacheCounterOrder}.Cleanup" />
         public async Task Cleanup()
         {
             if (_policy.CachingType == CachingType.DistributedSubscriber)
@@ -97,7 +131,7 @@ namespace IL.RankedCache.Services
 
                 foreach (var key in entriesToRemove)
                 {
-                    await _cacheProvider.Delete(key);
+                    await _cacheProvider.DeleteAsync(key);
                     _cacheAccessCounter.Remove(key);
                 }
             }
@@ -109,6 +143,7 @@ namespace IL.RankedCache.Services
             }
         }
 
+        /// <inheritdoc cref="IRankedCacheService{TCacheCounterOrder}.GetCacheAccessCounter" />
         public TCacheCounterOrder? GetCacheAccessCounter(string key)
         {
             return HasKey(key) ? _cacheAccessCounter[KeyWithSuffix(key)] : null;

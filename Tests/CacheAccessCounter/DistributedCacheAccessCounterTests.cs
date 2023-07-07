@@ -21,7 +21,7 @@ public class DistributedCacheAccessCounterTests
 
         // Assert
         Assert.Equal(1, counter.Count);
-        cacheProviderMock.Verify(x => x.Add(key + "_count", value, null), Times.Once);
+        cacheProviderMock.Verify(x => x.AddAsync(key + "_count", value, null), Times.Once);
     }
 
     [Fact]
@@ -40,7 +40,7 @@ public class DistributedCacheAccessCounterTests
         // Assert
         Assert.True(result);
         Assert.Equal(0, counter.Count);
-        cacheProviderMock.Verify(x => x.Delete(key + "_count"), Times.Once);
+        cacheProviderMock.Verify(x => x.DeleteAsync(key + "_count"), Times.Once);
     }
 
     [Fact]
@@ -60,7 +60,7 @@ public class DistributedCacheAccessCounterTests
 
         // Assert
         Assert.Equal(0, counter.Count);
-        cacheProviderMock.Verify(x => x.Delete(It.IsAny<string>()), Times.Exactly(3));
+        cacheProviderMock.Verify(x => x.DeleteAsync(It.IsAny<string>()), Times.Exactly(3));
     }
 
     [Fact]
@@ -103,7 +103,7 @@ public class DistributedCacheAccessCounterTests
         var key = "key";
         var value = 42;
         counter.Add(key, value);
-        cacheProviderMock.Setup(x => x.Get<int>(key + "_count")).ReturnsAsync(value);
+        cacheProviderMock.Setup(x => x.GetAsync<int>(key + "_count")).ReturnsAsync(value);
 
         // Act
         var result = counter.TryGetValue(key, out var retrievedValue);

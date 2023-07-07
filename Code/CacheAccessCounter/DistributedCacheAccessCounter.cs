@@ -19,7 +19,7 @@ namespace IL.RankedCache.CacheAccessCounter
         public IEnumerator<KeyValuePair<string, TCacheCounterOrder>> GetEnumerator()
         {
             return _counterNames
-                .Select(x => new KeyValuePair<string, TCacheCounterOrder>(x, _cacheProvider.Get<TCacheCounterOrder>(x).Result))
+                .Select(x => new KeyValuePair<string, TCacheCounterOrder>(x, _cacheProvider.GetAsync<TCacheCounterOrder>(x).Result))
                 .GetEnumerator();
         }
 
@@ -32,14 +32,14 @@ namespace IL.RankedCache.CacheAccessCounter
         {
             var composedKey = KeyWithSuffix(item.Key);
             _counterNames.Add(composedKey);
-            _cacheProvider.Add(composedKey, item.Value);
+            _cacheProvider.AddAsync(composedKey, item.Value);
         }
 
         public void Clear()
         {
             foreach (var counterName in _counterNames)
             {
-                _cacheProvider.Delete(counterName).Wait();
+                _cacheProvider.Delete(counterName);
             }
             _counterNames.Clear();
         }
@@ -57,7 +57,7 @@ namespace IL.RankedCache.CacheAccessCounter
         public bool Remove(KeyValuePair<string, TCacheCounterOrder> item)
         {
             var composedKey = KeyWithSuffix(item.Key);
-            _cacheProvider.Delete(composedKey).Wait();
+            _cacheProvider.Delete(composedKey);
             return _counterNames.Remove(composedKey);
         }
 
@@ -65,7 +65,7 @@ namespace IL.RankedCache.CacheAccessCounter
         {
             var composedKey = KeyWithSuffix(key);
             _counterNames.Add(composedKey);
-            _cacheProvider.Add(composedKey, value);
+            _cacheProvider.AddAsync(composedKey, value);
         }
 
         public bool ContainsKey(string key)
@@ -76,34 +76,34 @@ namespace IL.RankedCache.CacheAccessCounter
         public bool Remove(string key)
         {
             var composedKey = KeyWithSuffix(key);
-            _cacheProvider.Delete(composedKey).Wait();
+            _cacheProvider.Delete(composedKey);
             return _counterNames.Remove(composedKey);
         }
 
         public bool TryGetValue(string key, out TCacheCounterOrder value)
         {
             var composedKey = KeyWithSuffix(key);
-            value = _cacheProvider.Get<TCacheCounterOrder>(composedKey).Result;
+            value = _cacheProvider.GetAsync<TCacheCounterOrder>(composedKey).Result;
             return _counterNames.Contains(composedKey);
         }
 
         public TCacheCounterOrder this[string key]
         {
-            get => _cacheProvider.Get<TCacheCounterOrder>(KeyWithSuffix(key)).Result;
+            get => _cacheProvider.GetAsync<TCacheCounterOrder>(KeyWithSuffix(key)).Result;
             set
             {
                 var composedKey = KeyWithSuffix(key);
                 if (_cacheProvider.HasKey(composedKey))
                 {
-                    _cacheProvider.Delete(composedKey).Wait();
+                    _cacheProvider.Delete(composedKey);
                 }
-                _cacheProvider.Add(composedKey, value).Wait();
+                _cacheProvider.Add(composedKey, value);
                 _counterNames.Add(composedKey);
             }
         }
 
         public ICollection<string> Keys => _counterNames;
-        public ICollection<TCacheCounterOrder> Values => _counterNames.Select(x => _cacheProvider.Get<TCacheCounterOrder>(x).Result).ToList();
+        public ICollection<TCacheCounterOrder> Values => _counterNames.Select(x => _cacheProvider.GetAsync<TCacheCounterOrder>(x).Result).ToList();
 
         private static string KeyWithSuffix(string key)
         {

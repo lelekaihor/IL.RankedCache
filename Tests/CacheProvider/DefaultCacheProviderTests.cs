@@ -21,7 +21,7 @@ public class DefaultCacheProviderTests
         var obj = new TestObject();
 
         // Act
-        await _cacheProvider.Add(key, obj);
+        await _cacheProvider.AddAsync(key, obj);
         // Assert
         Assert.True(MemoryCache.Default.Contains(key));
     }
@@ -34,7 +34,7 @@ public class DefaultCacheProviderTests
         TestObject? obj = null;
 
         // Act
-        await _cacheProvider.Add(key, obj);
+        await _cacheProvider.AddAsync(key, obj);
 
         // Assert
         Assert.False(MemoryCache.Default.Contains(key));
@@ -50,7 +50,7 @@ public class DefaultCacheProviderTests
         MemoryCache.Default.Set(key, obj, DateTimeOffset.MaxValue);
 
         // Act
-        var result = await _cacheProvider.Get<TestObject>(key);
+        var result = await _cacheProvider.GetAsync<TestObject>(key);
 
         // Assert
         Assert.Equal(obj, result);
@@ -63,7 +63,7 @@ public class DefaultCacheProviderTests
         var key = "Get_WithNonExistingKey_ShouldReturnNull";
 
         // Act
-        var result = await _cacheProvider.Get<TestObject>(key);
+        var result = await _cacheProvider.GetAsync<TestObject>(key);
 
         // Assert
         Assert.Null(result);
@@ -79,7 +79,7 @@ public class DefaultCacheProviderTests
         MemoryCache.Default.Set(key, obj, DateTimeOffset.MaxValue);
 
         // Act
-        await _cacheProvider.Delete(key);
+        await _cacheProvider.DeleteAsync(key);
 
         // Assert
         Assert.False(MemoryCache.Default.Contains(key));
@@ -131,7 +131,7 @@ public class DefaultCacheProviderTests
         var obj = new TestObject();
 
         // Act
-        await _cacheProvider.Add(key, obj, DateTimeOffset.Now.AddSeconds(3));
+        await _cacheProvider.AddAsync(key, obj, DateTimeOffset.Now.AddSeconds(3));
         // Assert
         Assert.True(MemoryCache.Default.Contains(key));
         Thread.Sleep(4000);

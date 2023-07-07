@@ -22,10 +22,10 @@ namespace IL.RankedCache.Tests.Services
             var value = "testValue";
 
             // Act
-            await rankedCacheService.Add(key, value);
+            await rankedCacheService.AddAsync(key, value);
 
             // Assert
-            cacheProviderMock.Verify(mock => mock.Add(key, value, null), Times.Once);
+            cacheProviderMock.Verify(mock => mock.AddAsync(key, value, null), Times.Once);
         }
 
         [Fact]
@@ -39,7 +39,7 @@ namespace IL.RankedCache.Tests.Services
             var value = "testValue";
 
             // Act
-            await rankedCacheService.Add(key, value);
+            await rankedCacheService.AddAsync(key, value);
 
             // Assert
             Assert.True(rankedCacheService.HasKey(key));
@@ -55,14 +55,14 @@ namespace IL.RankedCache.Tests.Services
             var rankedCacheService = new RankedCacheService<int>(cacheProviderMock.Object, new InternalCacheAccessCounter<int>(), policy);
             var key = "testKey";
             var value = "testValue";
-            cacheProviderMock.Setup(x => x.Get<string>(key)).ReturnsAsync(value);
-            await rankedCacheService.Add(key, value);
+            cacheProviderMock.Setup(x => x.GetAsync<string>(key)).ReturnsAsync(value);
+            await rankedCacheService.AddAsync(key, value);
 
             // Act
-            await rankedCacheService.Get<string>(key);
+            await rankedCacheService.GetAsync<string>(key);
 
             // Assert
-            cacheProviderMock.Verify(mock => mock.Get<string>(key), Times.Once);
+            cacheProviderMock.Verify(mock => mock.GetAsync<string>(key), Times.Once);
             Assert.Equal(1, rankedCacheService.GetCacheAccessCounter(key));
         }
 
@@ -77,17 +77,17 @@ namespace IL.RankedCache.Tests.Services
             var value = "testValue";
 
             // Act 1
-            await rankedCacheService.Add(key, value);
+            await rankedCacheService.AddAsync(key, value);
 
             // Assert 1
             Assert.Equal(0, rankedCacheService.GetCacheAccessCounter(key));
             Assert.True(rankedCacheService.HasKey(key));
 
             // Act 2
-            await rankedCacheService.Get<string>(key);
+            await rankedCacheService.GetAsync<string>(key);
 
             // Assert 2
-            cacheProviderMock.Verify(mock => mock.Get<string>(key), Times.Once);
+            cacheProviderMock.Verify(mock => mock.GetAsync<string>(key), Times.Once);
             Assert.False(rankedCacheService.HasKey(key));
             Assert.Null(rankedCacheService.GetCacheAccessCounter(key));
         }
@@ -101,13 +101,13 @@ namespace IL.RankedCache.Tests.Services
             var rankedCacheService = new RankedCacheService<int>(cacheProviderMock.Object, new InternalCacheAccessCounter<int>(), policy);
             var key = "testKey";
             var value = "testValue";
-            await rankedCacheService.Add(key, value);
+            await rankedCacheService.AddAsync(key, value);
 
             // Act
-            await rankedCacheService.Delete(key);
+            await rankedCacheService.DeleteAsync(key);
 
             // Assert
-            cacheProviderMock.Verify(mock => mock.Delete(key), Times.Once);
+            cacheProviderMock.Verify(mock => mock.DeleteAsync(key), Times.Once);
             Assert.Null(rankedCacheService.GetCacheAccessCounter(key));
         }
 
@@ -123,7 +123,7 @@ namespace IL.RankedCache.Tests.Services
             var nonExistingKey = "nonExistingKey";
 
             // Act
-            await rankedCacheService.Add(existingKey, value);
+            await rankedCacheService.AddAsync(existingKey, value);
 
             // Assert
             Assert.True(rankedCacheService.HasKey(existingKey));
@@ -154,9 +154,9 @@ namespace IL.RankedCache.Tests.Services
             await rankedCacheService.Cleanup();
 
             // Assert
-            cacheProviderMock.Verify(mock => mock.Delete(It.IsAny<string>()), Times.Exactly(2));
-            cacheProviderMock.Verify(mock => mock.Delete("key3"), Times.Once);
-            cacheProviderMock.Verify(mock => mock.Delete("key6"), Times.Once);
+            cacheProviderMock.Verify(mock => mock.DeleteAsync(It.IsAny<string>()), Times.Exactly(2));
+            cacheProviderMock.Verify(mock => mock.DeleteAsync("key3"), Times.Once);
+            cacheProviderMock.Verify(mock => mock.DeleteAsync("key6"), Times.Once);
         }
 
         [Fact]
@@ -214,9 +214,9 @@ namespace IL.RankedCache.Tests.Services
             Thread.Sleep(TimeSpan.FromSeconds(1));
 
             // Assert
-            cacheProviderMock.Verify(mock => mock.Delete(It.IsAny<string>()), Times.Exactly(2));
-            cacheProviderMock.Verify(mock => mock.Delete("key3"), Times.Once);
-            cacheProviderMock.Verify(mock => mock.Delete("key6"), Times.Once);
+            cacheProviderMock.Verify(mock => mock.DeleteAsync(It.IsAny<string>()), Times.Exactly(2));
+            cacheProviderMock.Verify(mock => mock.DeleteAsync("key3"), Times.Once);
+            cacheProviderMock.Verify(mock => mock.DeleteAsync("key6"), Times.Once);
         }
 
         [Fact]
@@ -251,8 +251,8 @@ namespace IL.RankedCache.Tests.Services
             Thread.Sleep(TimeSpan.FromSeconds(1));
 
             // Assert
-            cacheProviderMock.Verify(mock => mock.Delete(It.IsAny<string>()), Times.Exactly(1));
-            cacheProviderMock.Verify(mock => mock.Delete("key6"), Times.Once);
+            cacheProviderMock.Verify(mock => mock.DeleteAsync(It.IsAny<string>()), Times.Exactly(1));
+            cacheProviderMock.Verify(mock => mock.DeleteAsync("key6"), Times.Once);
         }
     }
 
@@ -263,11 +263,11 @@ namespace IL.RankedCache.Tests.Services
         {
             foreach (var kvp in cacheAccessCounter)
             {
-                await rankedCacheService.Add(kvp.Key, testObject);
-                cacheProviderMock.Setup(x => x.Get<string>(kvp.Key)).ReturnsAsync(testObject);
+                await rankedCacheService.AddAsync(kvp.Key, testObject);
+                cacheProviderMock.Setup(x => x.GetAsync<string>(kvp.Key)).ReturnsAsync(testObject);
                 for (var i = 0; i < kvp.Value; i++)
                 {
-                    await rankedCacheService.Get<string>(kvp.Key);
+                    await rankedCacheService.GetAsync<string>(kvp.Key);
                 }
             }
         }

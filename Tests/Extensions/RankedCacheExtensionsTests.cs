@@ -15,7 +15,7 @@ namespace IL.RankedCache.Tests.Extensions
             var key = "testKey";
             var expectedValue = "newValue";
 
-            rankedCacheServiceMock.Setup(x => x.Get<string>(key)).ReturnsAsync(expectedValue);
+            rankedCacheServiceMock.Setup(x => x.GetAsync<string>(key)).ReturnsAsync(expectedValue);
 
             // Act
             var result = await rankedCacheServiceMock.Object.GetOrAddAsync(
@@ -41,7 +41,7 @@ namespace IL.RankedCache.Tests.Extensions
             var expectedValue = "newValue";
             var valueFactoryCalled = false;
 
-            rankedCacheServiceMock.Setup(x => x.Get<string>(key))
+            rankedCacheServiceMock.Setup(x => x.GetAsync<string>(key))
                 .ReturnsAsync((string)null);
 
             // Act
@@ -57,7 +57,7 @@ namespace IL.RankedCache.Tests.Extensions
             // Assert
             Assert.Equal(expectedValue, result);
             Assert.True(valueFactoryCalled, "Value factory should be called.");
-            rankedCacheServiceMock.Verify(x => x.Add(key, expectedValue, null), Times.Once);
+            rankedCacheServiceMock.Verify(x => x.AddAsync(key, expectedValue, null), Times.Once);
         }
 
         [Fact]
@@ -68,7 +68,7 @@ namespace IL.RankedCache.Tests.Extensions
             var key = "testKey";
             var expectedValue = "newValue";
 
-            rankedCacheServiceMock.Setup(x => x.Get<string>(key)).ReturnsAsync(expectedValue);
+            rankedCacheServiceMock.Setup(x => x.GetAsync<string>(key)).ReturnsAsync(expectedValue);
 
             // Act
             var result = await rankedCacheServiceMock.Object.GetOrAddAsync(
@@ -94,7 +94,7 @@ namespace IL.RankedCache.Tests.Extensions
             var expectedValue = "newValue";
             var valueFactoryCalled = false;
 
-            rankedCacheServiceMock.Setup(x => x.Get<string>(key))
+            rankedCacheServiceMock.Setup(x => x.GetAsync<string>(key))
                 .ReturnsAsync((string)null);
 
             // Act
@@ -110,7 +110,7 @@ namespace IL.RankedCache.Tests.Extensions
             // Assert
             Assert.Equal(expectedValue, result);
             Assert.True(valueFactoryCalled, "Value factory should be called.");
-            rankedCacheServiceMock.Verify(x => x.Add(key, expectedValue, null), Times.Once);
+            rankedCacheServiceMock.Verify(x => x.AddAsync(key, expectedValue, null), Times.Once);
         }
 
         [Fact]
@@ -121,7 +121,7 @@ namespace IL.RankedCache.Tests.Extensions
             var key = "testKey";
             var expectedValue = "newValue";
 
-            rankedCacheServiceMock.Setup(x => x.Get<string>(key)).ReturnsAsync(expectedValue);
+            rankedCacheServiceMock.Setup(x => x.GetAsync<string>(key)).ReturnsAsync(expectedValue);
 
             // Act
             var result = rankedCacheServiceMock.Object.GetOrAdd(
@@ -147,7 +147,7 @@ namespace IL.RankedCache.Tests.Extensions
             var expectedValue = "newValue";
             var valueFactoryCalled = false;
 
-            rankedCacheServiceMock.Setup(x => x.Get<string>(key))
+            rankedCacheServiceMock.Setup(x => x.GetAsync<string>(key))
                 .ReturnsAsync((string)null);
 
             // Act
@@ -163,7 +163,7 @@ namespace IL.RankedCache.Tests.Extensions
             // Assert
             Assert.Equal(expectedValue, result);
             Assert.True(valueFactoryCalled, "Value factory should be called.");
-            rankedCacheServiceMock.Verify(x => x.Add(key, expectedValue, null), Times.Once);
+            rankedCacheServiceMock.Verify(x => x.AddAsync(key, expectedValue, null), Times.Once);
         }
 
         [Fact]
@@ -174,7 +174,7 @@ namespace IL.RankedCache.Tests.Extensions
             var key = "testKey";
             var expectedValue = "newValue";
 
-            rankedCacheServiceMock.Setup(x => x.Get<string>(key)).ReturnsAsync(expectedValue);
+            rankedCacheServiceMock.Setup(x => x.GetAsync<string>(key)).ReturnsAsync(expectedValue);
 
             // Act
             var result = rankedCacheServiceMock.Object.GetOrAdd(
@@ -200,7 +200,7 @@ namespace IL.RankedCache.Tests.Extensions
             var expectedValue = "newValue";
             var valueFactoryCalled = false;
 
-            rankedCacheServiceMock.Setup(x => x.Get<string>(key))
+            rankedCacheServiceMock.Setup(x => x.GetAsync<string>(key))
                 .ReturnsAsync((string)null);
 
             // Act
@@ -216,7 +216,7 @@ namespace IL.RankedCache.Tests.Extensions
             // Assert
             Assert.Equal(expectedValue, result);
             Assert.True(valueFactoryCalled, "Value factory should be called.");
-            rankedCacheServiceMock.Verify(x => x.Add(key, expectedValue, null), Times.Once);
+            rankedCacheServiceMock.Verify(x => x.AddAsync(key, expectedValue, null), Times.Once);
         }
     }
 }
