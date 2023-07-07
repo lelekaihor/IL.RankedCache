@@ -40,7 +40,7 @@ public class DistributedCacheAccessCounterTests
         // Assert
         Assert.True(result);
         Assert.Equal(0, counter.Count);
-        cacheProviderMock.Verify(x => x.DeleteAsync(key + "_count"), Times.Once);
+        cacheProviderMock.Verify(x => x.Delete(key + "_count"), Times.Once);
     }
 
     [Fact]
@@ -60,7 +60,7 @@ public class DistributedCacheAccessCounterTests
 
         // Assert
         Assert.Equal(0, counter.Count);
-        cacheProviderMock.Verify(x => x.DeleteAsync(It.IsAny<string>()), Times.Exactly(3));
+        cacheProviderMock.Verify(x => x.Delete(It.IsAny<string>()), Times.Exactly(3));
     }
 
     [Fact]

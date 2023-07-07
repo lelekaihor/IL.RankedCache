@@ -73,12 +73,27 @@ namespace IL.RankedCache.Tests.Extensions
 
         public class CustomCacheProvider : ICacheProvider
         {
+            public void Add<T>(string key, T? obj, DateTimeOffset? absoluteExpiration = null)
+            {
+                throw new NotImplementedException();
+            }
+
             public Task AddAsync<T>(string key, T? obj, DateTimeOffset? absoluteExpiration)
             {
                 throw new NotImplementedException();
             }
 
+            public T Get<T>(string key)
+            {
+                throw new NotImplementedException();
+            }
+
             public Task<T> GetAsync<T>(string key)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Delete(string key)
             {
                 throw new NotImplementedException();
             }
