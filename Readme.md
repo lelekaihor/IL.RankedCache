@@ -1,3 +1,4 @@
+[![NuGet version (IL.RankedCache)](https://img.shields.io/nuget/v/IL.RankedCache.svg?style=flat-square)](https://www.nuget.org/packages/IL.RankedCache/)
 # Ranked Cache
 
 * Easy to setup
