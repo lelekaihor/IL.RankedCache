@@ -4,7 +4,7 @@
     <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <PackageVersion>1.0.10</PackageVersion>
+    <PackageVersion>1.0.12</PackageVersion>
     <Title>Ranked Cache</Title>
     <Authors>Ihor Leleka</Authors>
     <Description>Decorator for caching mechanism of your preference allowing to keep track of how many times each entry was accessed, including some manual and automated cleanup possibilities.</Description>

@@ -11,13 +11,30 @@ namespace IL.RankedCache.Tests.Extensions
     public class ServiceCollectionExtensionsTests
     {
         [Fact]
+        public void AddRankedCache_NonSpecialized_DefaultCacheProvider_AddsServices()
+        {
+            // Arrange
+            var services = new ServiceCollection();
+
+            // Act
+            services.AddRankedCache();
+
+            // Assert
+            var serviceProvider = services.BuildServiceProvider();
+            Assert.NotNull(serviceProvider.GetService<ICacheProvider>());
+            Assert.NotNull(serviceProvider.GetService<IRankedCacheService>());
+            Assert.IsType<DefaultCacheProvider>(serviceProvider.GetService<ICacheProvider>());
+            Assert.IsType<RankedCacheService>(serviceProvider.GetService<IRankedCacheService>());
+        }
+
+        [Fact]
         public void AddRankedCache_DefaultCacheProvider_AddsServices()
         {
             // Arrange
             var services = new ServiceCollection();
 
             // Act
-            services.AddRankedCache<short>();
+            services.AddRankedCacheSpecialized<short>();
 
             // Assert
             var serviceProvider = services.BuildServiceProvider();
@@ -34,7 +51,7 @@ namespace IL.RankedCache.Tests.Extensions
             var services = new ServiceCollection();
 
             // Act
-            services.AddRankedCache<short, CustomCacheProvider>();
+            services.AddRankedCacheSpecialized<short, CustomCacheProvider>();
 
             // Assert
             var serviceProvider = services.BuildServiceProvider();
@@ -52,7 +69,7 @@ namespace IL.RankedCache.Tests.Extensions
             var expected = 150;
 
             // Act
-            services.AddRankedCache<int>(options => options.MaxItems = expected);
+            services.AddRankedCacheSpecialized<int>(options => options.MaxItems = expected);
 
             // Assert
             var serviceProvider = services.BuildServiceProvider();
@@ -68,7 +85,7 @@ namespace IL.RankedCache.Tests.Extensions
             var services = new ServiceCollection();
 
             // Act & Assert
-            Assert.Throws<NotSupportedException>(() => services.AddRankedCache<byte>());
+            Assert.Throws<NotSupportedException>(() => services.AddRankedCacheSpecialized<byte>());
         }
 
         public class CustomCacheProvider : ICacheProvider
