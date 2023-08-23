@@ -17,6 +17,7 @@ namespace IL.RankedCache.Services
         private readonly RankedCachePolicy _policy;
         private readonly ICacheAccessCounter<TCacheCounterOrder> _cacheAccessCounter;
         private Timer? _cleanupTimer;
+        private Timer? _syncTimer;
 
         /// <summary>
         /// Default constructor will use RankedCachePolicy.Default
@@ -36,6 +37,7 @@ namespace IL.RankedCache.Services
             _cacheAccessCounter = cacheAccessCounter;
             _policy = policy.Value;
             SetupCleanupTimer();
+            SetupCounterEntriesInvalidationForExpiredCacheEntries();
         }
 
         /// <inheritdoc cref="IRankedCacheService{TCacheCounterOrder}.Add{T}" />
@@ -143,6 +145,17 @@ namespace IL.RankedCache.Services
             }
         }
 
+        public void CounterEntriesInvalidationForExpiredCacheEntries()
+        {
+            foreach (var key in _cacheAccessCounter.Keys)
+            {
+                if (!_cacheProvider.HasKey(key))
+                {
+                    _cacheAccessCounter.Remove(key);
+                }
+            }
+        }
+
         /// <inheritdoc cref="IRankedCacheService{TCacheCounterOrder}.GetCacheAccessCounter" />
         public TCacheCounterOrder? GetCacheAccessCounter(string key)
         {
@@ -152,6 +165,7 @@ namespace IL.RankedCache.Services
         public void Dispose()
         {
             _cleanupTimer?.Dispose();
+            _syncTimer?.Dispose();
         }
 
         private void SetupCleanupTimer()
@@ -159,6 +173,14 @@ namespace IL.RankedCache.Services
             if (_policy.CleanupMode == CleanupMode.Auto && _policy.CachingType == CachingType.SingleInstance || _policy.CachingType == CachingType.DistributedProcessing)
             {
                 _cleanupTimer = new Timer(CleanupCallback!, null, GetInitialDelay(_policy.Frequency!.Value), _policy.Frequency!.Value);
+            }
+        }
+
+        private void SetupCounterEntriesInvalidationForExpiredCacheEntries()
+        {
+            if (_policy.OutdatedCounterEntriesSyncSettings != null && _policy.OutdatedCounterEntriesSyncSettings!.OutdatedCounterEntriesSyncEnabled)
+            {
+                _syncTimer = new Timer(CounterEntriesInvalidationForExpiredCacheEntriesCallback!, null, GetInitialDelay(_policy.OutdatedCounterEntriesSyncSettings.Frequency), _policy.OutdatedCounterEntriesSyncSettings.Frequency);
             }
         }
 
@@ -179,6 +201,11 @@ namespace IL.RankedCache.Services
         private void CleanupCallback(object state)
         {
             _ = Cleanup();
+        }
+
+        private void CounterEntriesInvalidationForExpiredCacheEntriesCallback(object state)
+        {
+            CounterEntriesInvalidationForExpiredCacheEntries();
         }
 
         private string KeyWithSuffix(string key)
