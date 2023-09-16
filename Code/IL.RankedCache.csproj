@@ -34,4 +34,8 @@
     <PackageReference Include="System.Runtime.Caching" Version="7.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="IL.InMemoryCacheProvider" Version="1.0.0" />
+  </ItemGroup>
+
 </Project>

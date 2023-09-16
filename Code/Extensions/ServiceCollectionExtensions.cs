@@ -1,5 +1,5 @@
-﻿using IL.RankedCache.CacheAccessCounter;
-using IL.RankedCache.CacheProvider;
+﻿using IL.InMemoryCacheProvider.CacheProvider;
+using IL.RankedCache.CacheAccessCounter;
 using IL.RankedCache.Models;
 using IL.RankedCache.Policies;
 using IL.RankedCache.Services;
@@ -14,7 +14,7 @@ namespace IL.RankedCache.Extensions
         /// </summary>
         public static void AddRankedCache(this IServiceCollection services, Action<RankedCachePolicy>? options = null)
         {
-            services.RegisterCacheProvider<DefaultCacheProvider>();
+            services.RegisterCacheProvider<InMemoryCacheProvider.CacheProvider.InMemoryCacheProvider>();
             services.RegisterDefaultRankedCacheService(options);
         }
 
@@ -40,7 +40,7 @@ namespace IL.RankedCache.Extensions
             }
 
             services.RegisterRankedCacheService<TCacheCounterOrder>(options);
-            services.RegisterCacheProvider<DefaultCacheProvider>();
+            services.RegisterCacheProvider<InMemoryCacheProvider.CacheProvider.InMemoryCacheProvider>();
         }
 
         /// <summary>

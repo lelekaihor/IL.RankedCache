@@ -1,5 +1,5 @@
-﻿using IL.RankedCache.CacheAccessCounter;
-using IL.RankedCache.CacheProvider;
+﻿using IL.InMemoryCacheProvider.CacheProvider;
+using IL.RankedCache.CacheAccessCounter;
 using Moq;
 using Xunit;
 

@@ -1,16 +1,15 @@
 ﻿using System.Runtime.Caching;
-using IL.RankedCache.CacheProvider;
 using Xunit;
 
 namespace IL.RankedCache.Tests.CacheProvider;
 
 public class DefaultCacheProviderTests
 {
-    private readonly DefaultCacheProvider _cacheProvider;
+    private readonly InMemoryCacheProvider.CacheProvider.InMemoryCacheProvider _cacheProvider;
 
     public DefaultCacheProviderTests()
     {
-        _cacheProvider = new DefaultCacheProvider();
+        _cacheProvider = new InMemoryCacheProvider.CacheProvider.InMemoryCacheProvider();
     }
 
     [Fact]

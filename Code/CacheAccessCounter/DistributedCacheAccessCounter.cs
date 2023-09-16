@@ -1,5 +1,5 @@
 ﻿using System.Collections;
-using IL.RankedCache.CacheProvider;
+using IL.InMemoryCacheProvider.CacheProvider;
 
 namespace IL.RankedCache.CacheAccessCounter
 {
