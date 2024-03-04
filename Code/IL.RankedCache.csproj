@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
+    <TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <PackageVersion>1.1.1</PackageVersion>
+    <PackageVersion>1.1.2</PackageVersion>
     <Title>Ranked Cache</Title>
     <Authors>Ihor Leleka</Authors>
     <Description>Decorator for caching mechanism of your preference allowing to keep track of how many times each entry was accessed, including some manual and automated cleanup possibilities.</Description>
@@ -35,7 +35,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="IL.InMemoryCacheProvider" Version="1.0.1" />
+    <PackageReference Include="IL.InMemoryCacheProvider" Version="1.1.2" />
   </ItemGroup>
 
 </Project>

@@ -21,7 +21,7 @@ public class DistributedCacheAccessCounterTests
 
         // Assert
         Assert.Equal(1, counter.Count);
-        cacheProviderMock.Verify(x => x.AddAsync(key + "_count", value, null), Times.Once);
+        cacheProviderMock.Verify(x => x.AddAsync(key + "_count", value, null, null), Times.Once);
     }
 
     [Fact]

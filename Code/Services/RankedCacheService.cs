@@ -11,7 +11,8 @@ namespace IL.RankedCache.Services
     /// Ranked cache service
     /// </summary>
     /// <typeparam name="TCacheCounterOrder">Accepts short, int and long as constraints. Will throw NotSupportedException for all other types.</typeparam>
-    internal class RankedCacheService<TCacheCounterOrder> : IRankedCacheService<TCacheCounterOrder> where TCacheCounterOrder : struct
+    internal class RankedCacheService<TCacheCounterOrder> : IRankedCacheService<TCacheCounterOrder>
+        where TCacheCounterOrder : struct
     {
         private readonly ICacheProvider _cacheProvider;
         private readonly RankedCachePolicy _policy;
@@ -26,9 +27,11 @@ namespace IL.RankedCache.Services
         /// <param name="cacheAccessCounter">Cache access counter</param>
         /// <param name="policy">Ranked cache policy</param>
         /// <exception cref="NotSupportedException"></exception>
-        public RankedCacheService(ICacheProvider cacheProvider, ICacheAccessCounter<TCacheCounterOrder> cacheAccessCounter, IOptions<RankedCachePolicy> policy)
+        public RankedCacheService(ICacheProvider cacheProvider,
+            ICacheAccessCounter<TCacheCounterOrder> cacheAccessCounter, IOptions<RankedCachePolicy> policy)
         {
-            if (typeof(TCacheCounterOrder) != typeof(short) && typeof(TCacheCounterOrder) != typeof(int) && typeof(TCacheCounterOrder) != typeof(long))
+            if (typeof(TCacheCounterOrder) != typeof(short) && typeof(TCacheCounterOrder) != typeof(int) &&
+                typeof(TCacheCounterOrder) != typeof(long))
             {
                 throw new NotSupportedException($"TRange of type {typeof(TCacheCounterOrder)} is not supported.");
             }
@@ -41,23 +44,34 @@ namespace IL.RankedCache.Services
         }
 
         /// <inheritdoc cref="IRankedCacheService{TCacheCounterOrder}.Add{T}" />
-        public void Add<T>(string key, T? obj, DateTimeOffset? absoluteExpiration = null)
+        public void Add<T>(string key, T? obj, DateTimeOffset? expiration = null, TimeSpan? slidingExpiration = null)
         {
             if (obj != null)
             {
-                _cacheProvider.Add(KeyWithSuffix(key), obj, absoluteExpiration);
+                _cacheProvider.Add(KeyWithSuffix(key), obj, expiration);
                 _cacheAccessCounter[KeyWithSuffix(key)] = (TCacheCounterOrder)(object)0;
             }
         }
 
         /// <inheritdoc cref="IRankedCacheService{TCacheCounterOrder}.AddAsync{T}" />
-        public async Task AddAsync<T>(string key, T? obj, DateTimeOffset? absoluteExpiration = null)
+        public async Task AddAsync<T>(string key, T? obj, DateTimeOffset? expiration = null,
+            TimeSpan? slidingExpiration = null)
         {
             if (obj != null)
             {
-                await _cacheProvider.AddAsync(KeyWithSuffix(key), obj, absoluteExpiration);
+                await _cacheProvider.AddAsync(KeyWithSuffix(key), obj, expiration);
                 _cacheAccessCounter[KeyWithSuffix(key)] = (TCacheCounterOrder)(object)0;
             }
+        }
+
+        public void Add<T>(string key, T? obj, DateTimeOffset? absoluteExpiration = null)
+        {
+            Add(key, obj, null, null);
+        }
+
+        public async Task AddAsync<T>(string key, T? obj, DateTimeOffset? absoluteExpiration = null)
+        {
+            await AddAsync(key, obj, null, null);
         }
 
         /// <inheritdoc cref="IRankedCacheService{TCacheCounterOrder}.Get{T}" />
@@ -112,6 +126,28 @@ namespace IL.RankedCache.Services
         public bool HasKey(string key)
         {
             return _cacheAccessCounter.ContainsKey(KeyWithSuffix(key));
+        }
+
+        public async Task<IEnumerable<string>> GetAllKeysAsync()
+        {
+            return GetAllKeys();
+        }
+
+        public IEnumerable<string> GetAllKeys()
+        {
+            return _cacheAccessCounter.Keys;
+        }
+
+        public async Task DeleteAllAsync()
+        {
+            _cacheAccessCounter.Clear();
+            await _cacheProvider.DeleteAllAsync();
+        }
+
+        public void DeleteAll()
+        {
+            _cacheAccessCounter.Clear();
+            _cacheProvider.DeleteAll();
         }
 
         /// <inheritdoc cref="IRankedCacheService{TCacheCounterOrder}.Cleanup" />
@@ -170,17 +206,22 @@ namespace IL.RankedCache.Services
 
         private void SetupCleanupTimer()
         {
-            if (_policy.CleanupMode == CleanupMode.Auto && _policy.CachingType == CachingType.SingleInstance || _policy.CachingType == CachingType.DistributedProcessing)
+            if (_policy.CleanupMode == CleanupMode.Auto && _policy.CachingType == CachingType.SingleInstance ||
+                _policy.CachingType == CachingType.DistributedProcessing)
             {
-                _cleanupTimer = new Timer(CleanupCallback!, null, GetInitialDelay(_policy.Frequency!.Value), _policy.Frequency!.Value);
+                _cleanupTimer = new Timer(CleanupCallback!, null, GetInitialDelay(_policy.Frequency!.Value),
+                    _policy.Frequency!.Value);
             }
         }
 
         private void SetupCounterEntriesInvalidationForExpiredCacheEntries()
         {
-            if (_policy.OutdatedCounterEntriesSyncSettings != null && _policy.OutdatedCounterEntriesSyncSettings!.OutdatedCounterEntriesSyncEnabled)
+            if (_policy.OutdatedCounterEntriesSyncSettings != null &&
+                _policy.OutdatedCounterEntriesSyncSettings!.OutdatedCounterEntriesSyncEnabled)
             {
-                _syncTimer = new Timer(CounterEntriesInvalidationForExpiredCacheEntriesCallback!, null, GetInitialDelay(_policy.OutdatedCounterEntriesSyncSettings.Frequency), _policy.OutdatedCounterEntriesSyncSettings.Frequency);
+                _syncTimer = new Timer(CounterEntriesInvalidationForExpiredCacheEntriesCallback!, null,
+                    GetInitialDelay(_policy.OutdatedCounterEntriesSyncSettings.Frequency),
+                    _policy.OutdatedCounterEntriesSyncSettings.Frequency);
             }
         }
 
