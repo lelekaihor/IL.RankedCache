@@ -1,5 +1,5 @@
-﻿using IL.InMemoryCacheProvider.CacheProvider;
-using IL.RankedCache.CacheAccessCounter;
+﻿using IL.RankedCache.CacheAccessCounter;
+using IL.RankedCache.CacheProvider;
 using IL.RankedCache.Extensions;
 using IL.RankedCache.Models;
 using IL.RankedCache.Policies;
@@ -44,34 +44,23 @@ namespace IL.RankedCache.Services
         }
 
         /// <inheritdoc cref="IRankedCacheService{TCacheCounterOrder}.Add{T}" />
-        public void Add<T>(string key, T? obj, DateTimeOffset? expiration = null, TimeSpan? slidingExpiration = null)
+        public void Add<T>(string key, T? obj, DateTimeOffset? absoluteExpiration = default)
         {
             if (obj != null)
             {
-                _cacheProvider.Add(KeyWithSuffix(key), obj, expiration);
+                _cacheProvider.Add(KeyWithSuffix(key), obj, absoluteExpiration);
                 _cacheAccessCounter[KeyWithSuffix(key)] = (TCacheCounterOrder)(object)0;
             }
         }
 
         /// <inheritdoc cref="IRankedCacheService{TCacheCounterOrder}.AddAsync{T}" />
-        public async Task AddAsync<T>(string key, T? obj, DateTimeOffset? expiration = null,
-            TimeSpan? slidingExpiration = null)
+        public async Task AddAsync<T>(string key, T? obj, DateTimeOffset? absoluteExpiration = default)
         {
             if (obj != null)
             {
-                await _cacheProvider.AddAsync(KeyWithSuffix(key), obj, expiration);
+                await _cacheProvider.AddAsync(KeyWithSuffix(key), obj, absoluteExpiration);
                 _cacheAccessCounter[KeyWithSuffix(key)] = (TCacheCounterOrder)(object)0;
             }
-        }
-
-        public void Add<T>(string key, T? obj, DateTimeOffset? absoluteExpiration = null)
-        {
-            Add(key, obj, null, null);
-        }
-
-        public async Task AddAsync<T>(string key, T? obj, DateTimeOffset? absoluteExpiration = null)
-        {
-            await AddAsync(key, obj, null, null);
         }
 
         /// <inheritdoc cref="IRankedCacheService{TCacheCounterOrder}.Get{T}" />
@@ -88,7 +77,7 @@ namespace IL.RankedCache.Services
                 _cacheAccessCounter.Remove(KeyWithSuffix(key));
             }
 
-            return result;
+            return result!;
         }
 
         /// <inheritdoc cref="IRankedCacheService{TCacheCounterOrder}.GetAsync{T}" />
@@ -105,7 +94,7 @@ namespace IL.RankedCache.Services
                 _cacheAccessCounter.Remove(KeyWithSuffix(key));
             }
 
-            return result;
+            return result!;
         }
 
         /// <inheritdoc cref="IRankedCacheService{TCacheCounterOrder}.Delete" />
@@ -126,28 +115,6 @@ namespace IL.RankedCache.Services
         public bool HasKey(string key)
         {
             return _cacheAccessCounter.ContainsKey(KeyWithSuffix(key));
-        }
-
-        public async Task<IEnumerable<string>> GetAllKeysAsync()
-        {
-            return GetAllKeys();
-        }
-
-        public IEnumerable<string> GetAllKeys()
-        {
-            return _cacheAccessCounter.Keys;
-        }
-
-        public async Task DeleteAllAsync()
-        {
-            _cacheAccessCounter.Clear();
-            await _cacheProvider.DeleteAllAsync();
-        }
-
-        public void DeleteAll()
-        {
-            _cacheAccessCounter.Clear();
-            _cacheProvider.DeleteAll();
         }
 
         /// <inheritdoc cref="IRankedCacheService{TCacheCounterOrder}.Cleanup" />

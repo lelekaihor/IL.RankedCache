@@ -1,5 +1,5 @@
 ﻿using System.Collections;
-using IL.InMemoryCacheProvider.CacheProvider;
+using IL.RankedCache.CacheProvider;
 
 namespace IL.RankedCache.CacheAccessCounter
 {
@@ -51,7 +51,6 @@ namespace IL.RankedCache.CacheAccessCounter
 
         public void CopyTo(KeyValuePair<string, TCacheCounterOrder>[] array, int arrayIndex)
         {
-            return;
         }
 
         public bool Remove(KeyValuePair<string, TCacheCounterOrder> item)

@@ -1,5 +1,5 @@
-﻿using IL.InMemoryCacheProvider.CacheProvider;
-using IL.RankedCache.CacheAccessCounter;
+﻿using IL.RankedCache.CacheAccessCounter;
+using IL.RankedCache.CacheProvider;
 using Moq;
 using Xunit;
 
@@ -20,8 +20,8 @@ public class DistributedCacheAccessCounterTests
         counter.Add(key, value);
 
         // Assert
-        Assert.Equal(1, counter.Count);
-        cacheProviderMock.Verify(x => x.AddAsync(key + "_count", value, null, null), Times.Once);
+        Assert.Single(counter);
+        cacheProviderMock.Verify(x => x.AddAsync(key + "_count", value, null), Times.Once);
     }
 
     [Fact]
@@ -39,7 +39,7 @@ public class DistributedCacheAccessCounterTests
 
         // Assert
         Assert.True(result);
-        Assert.Equal(0, counter.Count);
+        Assert.Empty(counter);
         cacheProviderMock.Verify(x => x.Delete(key + "_count"), Times.Once);
     }
 
@@ -59,7 +59,7 @@ public class DistributedCacheAccessCounterTests
         counter.Clear();
 
         // Assert
-        Assert.Equal(0, counter.Count);
+        Assert.Empty(counter);
         cacheProviderMock.Verify(x => x.Delete(It.IsAny<string>()), Times.Exactly(3));
     }
 
@@ -120,13 +120,12 @@ public class DistributedCacheAccessCounterTests
         var cacheProviderMock = new Mock<ICacheProvider>();
         var counter = new DistributedCacheAccessCounter<int>(cacheProviderMock.Object);
         var key = "key";
-        var value = 42;
 
         // Act
         var result = counter.TryGetValue(key, out var retrievedValue);
 
         // Assert
         Assert.False(result);
-        Assert.Equal(default(int), retrievedValue);
+        Assert.Equal(default, retrievedValue);
     }
 }

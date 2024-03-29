@@ -1,5 +1,5 @@
-﻿using IL.InMemoryCacheProvider.CacheProvider;
-using IL.RankedCache.CacheAccessCounter;
+﻿using IL.RankedCache.CacheAccessCounter;
+using IL.RankedCache.CacheProvider;
 using IL.RankedCache.Models;
 using IL.RankedCache.Policies;
 using IL.RankedCache.Services;
@@ -14,7 +14,7 @@ namespace IL.RankedCache.Extensions
         /// </summary>
         public static void AddRankedCache(this IServiceCollection services, Action<RankedCachePolicy>? options = null)
         {
-            services.RegisterCacheProvider<InMemoryCacheProvider.CacheProvider.InMemoryCacheProvider>();
+            services.RegisterCacheProvider<DefaultInMemoryCacheProvider>();
             services.RegisterDefaultRankedCacheService(options);
         }
 
@@ -40,7 +40,7 @@ namespace IL.RankedCache.Extensions
             }
 
             services.RegisterRankedCacheService<TCacheCounterOrder>(options);
-            services.RegisterCacheProvider<InMemoryCacheProvider.CacheProvider.InMemoryCacheProvider>();
+            services.RegisterCacheProvider<DefaultInMemoryCacheProvider>();
         }
 
         /// <summary>
@@ -99,6 +99,10 @@ namespace IL.RankedCache.Extensions
         private static void RegisterCacheProvider<TCacheProvider>(this IServiceCollection services) where TCacheProvider : class, ICacheProvider
         {
             services.AddSingleton<ICacheProvider, TCacheProvider>();
+            if (typeof(TCacheProvider) == typeof(DefaultInMemoryCacheProvider))
+            {
+                services.AddSingleton<InMemoryCacheProvider.CacheProvider.ICacheProvider, InMemoryCacheProvider.CacheProvider.InMemoryCacheProvider>();
+            }
         }
     }
 }
